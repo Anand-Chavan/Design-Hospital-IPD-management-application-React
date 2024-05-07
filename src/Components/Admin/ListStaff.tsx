@@ -1,7 +1,10 @@
 // src/components/Admin/ListStaff.js
 
 const ListStaff = () => {
-  // Implementation for listing staff
-};
+  return (
+    <div>
+      List of staff
+    </div>
+  )};
 
 export default ListStaff;
