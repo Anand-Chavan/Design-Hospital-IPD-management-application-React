@@ -1,17 +1,23 @@
 import '../../Styles/sideBar.css';
-import { Nav } from 'react-bootstrap';
 import { AdminMenu } from '../../Utils/constants';
 
 
+const Sidebar = ({handleRouteFromApp}:any) => {
 
-const Sidebar = () => {
-    return(
-        <Nav defaultActiveKey="/home" className="flex-column">
-            {AdminMenu.map((link, index) => (
-                <Nav.Link key={index} href={link.path}>{link.name}</Nav.Link>
-            ))}
-      </Nav>
+    const handleRoute = (item:any) => {
+        console.log("Item",item)
+        handleRouteFromApp(item)
+    }
+
+    return (
+        <div className="sidebar">
+            <ul style={{ listStyleType: 'none' }}>
+                {AdminMenu.map((link, index) => (
+                    <li key={index} style={{ padding: '10px' }} onClick={() => handleRoute(link)}>{link.name}</li>
+                ))}
+            </ul>
+        </div>
     )
 };
-  
-  export default Sidebar;
+
+export default Sidebar;

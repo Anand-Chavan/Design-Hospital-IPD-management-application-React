@@ -1,7 +1,7 @@
 // src/components/Admin/EnrollStaff.js
 
 const EnrollStaff = () => {
-  // Implementation for enrolling staff
+  console.log("Enroll Staff");
   return (
     <div>
       Enroll

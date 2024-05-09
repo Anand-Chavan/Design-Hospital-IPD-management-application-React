@@ -1,5 +1,5 @@
 export const AdminMenu = [
-  {name:'Manage Rooms',key:'room_details',path:'room_details',component:'RoomDetails'},
+  {name:'Manage Rooms',key:'room_details',path:'room_details',component:'ManageRooms'},
   {name:'Staff Details',key:'staff_details',path:'staff_details',component:'ListStaff'},
 ];
 
@@ -12,4 +12,10 @@ export const PatientMenu = [
   {name:'Details',key:'enroll_staff',path:'enroll_staff',component:''},
 ];
 
+export interface MenuItem {
+  name: string;
+  key: string;
+  path: string;
+  component: string;
+}
 

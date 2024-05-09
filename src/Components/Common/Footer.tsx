@@ -3,9 +3,9 @@ import { Container } from 'react-bootstrap';
 
 const Footer = () => {
     return (
-        <footer className="bg-dark text-light">
+        <footer style={{ backgroundColor: '#1976d2', color: '#ffffff' }}>
             <Container>
-            <p>&copy; 2024 My Website. All Rights Reserved.</p>
+            <p>&copy; 2024 Josh Hospital Managment System. All Rights Reserved.</p>
             </Container>
         </footer>
     )
