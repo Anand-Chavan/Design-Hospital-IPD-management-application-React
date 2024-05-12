@@ -43,10 +43,10 @@ function App() {
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Header />
       <div style={{ flex: '1 0 80%', display: 'flex', flexDirection: 'row' }}>
-        <div style={{ flex: '0 0 20%', backgroundColor: '#f9f9f9', color: '#0d0d0d' }}>
+        <div style={{ flex: '0 0 15%', backgroundColor: '#f9f9f9', color: '#0d0d0d' }}>
           <Sidebar  handleRouteFromApp={handleRouteFromApp}/>
         </div>
-        <div style={{ flex: '1 0 80%', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ flex: '1 0 75%', display: 'flex', flexDirection: 'column' }}>
           {renderComponent(content)}
         </div>
       </div>

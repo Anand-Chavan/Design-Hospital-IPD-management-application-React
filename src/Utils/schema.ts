@@ -89,6 +89,27 @@ export interface RoomCapacity {
     updated_at: string; 
     room_id: number;
 }
+
+
+// Generate dummy data for Room interface
+const generateDummyRooms = (count: number): Room[] => {
+    const rooms: Room[] = [];
+    for (let i = 1; i <= count; i++) {
+        const room: Room = {
+            id: i,
+            room_type: `Room Type ${i}`,
+            description: `Description for Room ${i}`,
+            charges: Math.floor(Math.random() * 1000) + 100,
+            capacity: Math.floor(Math.random() * 5) + 1,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
+        rooms.push(room);
+    }
+    return rooms;
+};
+
+export default generateDummyRooms;
   
   
   
