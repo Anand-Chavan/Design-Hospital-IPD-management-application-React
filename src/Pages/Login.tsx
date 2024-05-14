@@ -1,21 +1,52 @@
 import React, { useState } from 'react';
-import '../Styles/login.css'; // Assuming you have a CSS file named Login.css for styling
+import '../Styles/login.css';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const Login = () => {
+
+const Login = ({ onLogin }:any) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
 
-    const handleLogin = (e:any) => {
+    const handleLogin = async (e: any) => {
         e.preventDefault();
-        // Here you can add authentication logic, such as calling an API to validate the credentials
-        if (username === 'admin' && password === 'admin123') {
-            // Successful login, navigate to dashboard or perform other actions
-            console.log('Login successful!');
-        } else {
-            setError('Invalid username or password');
+        const requestBody = {
+            "user": {
+                "email": username,
+                "password": password
+            }
+        }
+
+        try {
+            const response = await fetch('http://localhost:3000/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const authorizationHeader = response.headers.get('Authorization');
+                if (authorizationHeader) {
+                    onLogin(authorizationHeader,data);
+                    toast.success('Login successful!');
+                } else {
+                    console.error('Authorization header not found in response');
+                    toast.error('Something went wrong');
+                }
+            } else {
+                setError('Invalid username or password');
+                toast.error('Something went wrong');
+            }
+        } catch (error) {
+            console.error('Error during login:', error);
+            toast.error('Something went wrong');
         }
     };
+
 
     return (
         <div className="login-container">
@@ -44,6 +75,17 @@ const Login = () => {
                 </div>
                 <button type="submit">Login</button>
             </form>
+            <ToastContainer position="top-left"
+                autoClose={5000}
+                toastStyle={{ width: '400px' }}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"></ToastContainer>
         </div>
     );
 };

@@ -12,9 +12,7 @@
 
 # Admin can enroll staff.
 
-# Admin can add/update/delete rooms with details like name, charges, etc. This will not be allowed
- 
-# for staff.
+# Admin can add/update/delete rooms with details like name, charges, etc. This will not be allowed fo staff.
 
 # Admin can list out all the staff with filtering parameters like name or mobile number prefix.
 

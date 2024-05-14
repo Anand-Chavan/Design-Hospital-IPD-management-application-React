@@ -96,3 +96,7 @@ tr:nth-child(even) {
     background-color: #cccccc;
     cursor: not-allowed;
 }
+
+button{
+    width: 100px;
+}

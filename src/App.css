@@ -8,3 +8,15 @@
   background-color: rgb(215, 236, 243);
 }
 
+.cp{
+  cursor: pointer;
+}
+
+.flt{
+  float: left;
+}
+
+.text-center{
+  text-align: center;
+}
+
