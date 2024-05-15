@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
-import '../../Styles/Modal.css'; // Import your CSS file
-
+import React, { useEffect, useState } from 'react';
+import '../../Styles/Modal.css';
+import { ToastContainer, toast } from 'react-toastify';
 
 interface EnrollStaffProps {
   onClose: () => void;
-  onAddSuccess: (newStaff: any) => void;
+  onSuccess: (newStaff: any) => void;
+  mode: string,
+  rowData?: any
 }
 
 interface StaffData {
@@ -17,7 +19,22 @@ interface StaffData {
   password: string;
 }
 
-const EnrollStaff: React.FC<EnrollStaffProps> = ({ onClose, onAddSuccess }) => {
+interface ApiResponseForUsers {
+  status: {
+    message: string;
+    data: {
+      id: number;
+      email: string;
+      created_at: string;
+      updated_at: string;
+      jti: string;
+    };
+    errors:[]
+  };
+}
+
+
+const EnrollStaff: React.FC<EnrollStaffProps> = ({ onClose, onSuccess, mode, rowData }) => {
   const [formData, setFormData] = useState<StaffData>({
     first_name: '',
     last_name: '',
@@ -27,6 +44,22 @@ const EnrollStaff: React.FC<EnrollStaffProps> = ({ onClose, onAddSuccess }) => {
     email: '',
     password: ''
   });
+
+  useEffect(() => {
+    console.log(mode, rowData)
+    if (mode == 'edit') {
+      const editObj = {
+        first_name: rowData?.first_name,
+        last_name: rowData?.last_name,
+        date_of_birth: rowData?.date_of_birth,
+        gender: rowData?.gender,
+        phone_no: rowData?.phone_no,
+        email: '',
+        password: '',
+      }
+      setFormData(editObj)
+    }
+  }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -38,63 +71,165 @@ const EnrollStaff: React.FC<EnrollStaffProps> = ({ onClose, onAddSuccess }) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log(formData)
+    if (mode == 'add')
+      handleAdd();
+    if (mode == 'edit')
+      handleEdit();
+  };
+
+
+
+  const handleAdd = async () => {
     try {
-      const response = await fetch('your-api-url', {
+      const requestBody = {
+        "user": {
+          "email": formData.email,
+          "password": formData.password
+        }
+      }
+      const responseForUser = await fetch('http://localhost:3000/users', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': localStorage.getItem('token') as string
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(requestBody),
       });
-      const data = await response.json();
-      onAddSuccess(data);
+      const dataForUsers: ApiResponseForUsers = await responseForUser.json();
+      console.log(dataForUsers)
+      if(dataForUsers.status.errors && dataForUsers.status.errors.length>0){
+        dataForUsers.status.errors.forEach((ele:string)=>{
+          toast.success(ele)
+        })
+      }
+
+      const requestBodyForUserDetails = {
+        "user_detail": {
+          "first_name": formData.first_name,
+          "last_name": formData.last_name,
+          "date_of_birth": formData.date_of_birth,
+          "gender": formData.gender,
+          "phone_no": formData.phone_no,
+          "user_id": dataForUsers.status.data.id,
+          "role_id": 2
+        }
+      }
+
+      const responseForUserDetails = await fetch('http://localhost:3000/user_details', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': localStorage.getItem('token') as string
+        },
+        body: JSON.stringify(requestBodyForUserDetails),
+      });
+      const dataForUserDetails = await responseForUserDetails.json();
+      onSuccess(dataForUserDetails);
+      toast.success('User Added successful!');
       onClose();
     } catch (error) {
       console.error('Error adding staff:', error);
     }
-  };
+  }
+
+  const handleEdit = async () => {
+    try {
+      const requestBodyForUserDetails = {
+        "user_detail": {
+          "first_name": formData.first_name,
+          "last_name": formData.last_name,
+          "date_of_birth": formData.date_of_birth,
+          "gender": formData.gender,
+          "phone_no": formData.phone_no,
+          "user_id": rowData.user_id,
+          "role_id": 2
+        }
+      }
+      const responseForUserDetails = await fetch(`http://localhost:3000/user_details/${rowData.user_id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': localStorage.getItem('token') as string
+        },
+
+        body: JSON.stringify(requestBodyForUserDetails),
+      });
+      onSuccess(responseForUserDetails);
+      toast.success('User Updated successful!');
+      onClose();
+    } catch (error) {
+      console.error('Error adding staff:', error);
+    }
+  }
+
 
   return (
 
     <div className="modal" style={{ display: 'block' }}>
-      <form onSubmit={handleSubmit}>
-        <div className="modal-content">
-          <div className='row'>
-            <div className='col-4'>
-            </div>
-            <div className='col-4 text-center'>
-              <h2>Add Staff</h2>
-            </div>
-            <div className='col-4'>
-              <span className="close" onClick={onClose}>&times;</span>
-            </div>
+      <div className="modal-content">
+        <div className='row'>
+          <div className='col-2'>
           </div>
-          <form onSubmit={handleSubmit}>
-            <div className="input-group">
-              <input type="text" name="first_name" value={formData.first_name} onChange={handleChange} placeholder="First Name" />
-            </div>
-            <div className="input-group">
-              <input type="text" name="last_name" value={formData.last_name} onChange={handleChange} placeholder="Last Name" />
-            </div>
-            <div className="input-group">
-              <input type="text" name="date_of_birth" value={formData.date_of_birth} onChange={handleChange} placeholder="Date of Birth" />
-            </div>
-            <div className="input-group">
-              <input type="text" name="gender" value={formData.gender} onChange={handleChange} placeholder="Gender" />
-            </div>
-            <div className="input-group">
-              <input type="text" name="phone_no" value={formData.phone_no} onChange={handleChange} placeholder="Phone Number" />
-            </div>
-            <div className="input-group">
-              <input type="text" name="email" value={formData.email} onChange={handleChange} placeholder="Email" />
-            </div>
-            <div className="input-group">
-              <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Password" />
-            </div>
-            <button type="submit" className="btn btn-primary">Submit</button>
-          </form>
+          <div className='col-8 text-center'>
+            <h2>{mode == 'add' ? 'Add' : 'Update'} Staff</h2>
+          </div>
+          <div className='col-2'>
+            <span className="close" onClick={onClose}>&times;</span>
+          </div>
         </div>
-      </form>
+        <form onSubmit={handleSubmit}>
+          <div className="input-group">
+            <input type="text" name="first_name" value={formData.first_name} onChange={handleChange} placeholder="First Name" />
+          </div>
+          <div className="input-group">
+            <input type="text" name="last_name" value={formData.last_name} onChange={handleChange} placeholder="Last Name" />
+          </div>
+          <div className="input-group">
+            <input type="text" name="date_of_birth" value={formData.date_of_birth} onChange={handleChange} placeholder="Date of Birth" />
+          </div>
+          <div className="input-group">
+            <input type="text" name="gender" value={formData.gender} onChange={handleChange} placeholder="Gender" />
+          </div>
+          <div className="input-group">
+            <input type="text" name="phone_no" value={formData.phone_no} onChange={handleChange} placeholder="Phone Number" />
+          </div>
+          {mode === 'add' && (
+            <>
+              <div className="input-group">
+                <input
+                  type="text"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Email"
+                />
+              </div>
+              <div className="input-group">
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Password"
+                />
+              </div>
+            </>
+          )}
+          <button type="submit" className="btn btn-primary">Submit</button>
+        </form>
+      </div>
+      <ToastContainer position="top-left"
+        autoClose={5000}
+        toastStyle={{ width: '400px' }}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"></ToastContainer>
     </div>
   );
 };
