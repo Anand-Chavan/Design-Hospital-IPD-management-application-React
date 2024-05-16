@@ -3,14 +3,14 @@ import '../../Styles/Modal.css';
 import '../../Styles/Room.css';
 import { ToastContainer, toast } from 'react-toastify';
 
-interface EnrollStaffProps {
+interface EnrollPatientProps {
   onClose: () => void;
-  onSuccess: (newStaff: any) => void;
+  onSuccess: (newPatient: any) => void;
   mode: string,
   rowData?: any
 }
 
-interface StaffData {
+interface PatientData {
   first_name: string;
   last_name: string;
   date_of_birth: string;
@@ -35,8 +35,8 @@ interface ApiResponseForUsers {
 }
 
 
-const EnrollStaff: React.FC<EnrollStaffProps> = ({ onClose, onSuccess, mode, rowData }) => {
-  const [formData, setFormData] = useState<StaffData>({
+const EnrollPatient: React.FC<EnrollPatientProps> = ({ onClose, onSuccess, mode, rowData }) => {
+  const [formData, setFormData] = useState<PatientData>({
     first_name: '',
     last_name: '',
     date_of_birth: '',
@@ -113,7 +113,7 @@ const EnrollStaff: React.FC<EnrollStaffProps> = ({ onClose, onSuccess, mode, row
           "gender": formData.gender,
           "phone_no": formData.phone_no,
           "user_id": dataForUsers.status.data.id,
-          "role_id": 2
+          "role_id": 3
         }
       }
 
@@ -130,7 +130,7 @@ const EnrollStaff: React.FC<EnrollStaffProps> = ({ onClose, onSuccess, mode, row
       toast.success('User Added successful!');
       onClose();
     } catch (error) {
-      console.error('Error adding staff:', error);
+      console.error('Error adding Patient:', error);
     }
   }
 
@@ -144,7 +144,7 @@ const EnrollStaff: React.FC<EnrollStaffProps> = ({ onClose, onSuccess, mode, row
           "gender": formData.gender,
           "phone_no": formData.phone_no,
           "user_id": rowData.user_id,
-          "role_id": 2
+          "role_id": 3
         }
       }
       const responseForUserDetails = await fetch(`http://localhost:3000/user_details/${rowData.user_id}`, {
@@ -160,7 +160,7 @@ const EnrollStaff: React.FC<EnrollStaffProps> = ({ onClose, onSuccess, mode, row
       toast.success('User Updated successful!');
       onClose();
     } catch (error) {
-      console.error('Error adding staff:', error);
+      console.error('Error adding Patient:', error);
     }
   }
 
@@ -173,7 +173,7 @@ const EnrollStaff: React.FC<EnrollStaffProps> = ({ onClose, onSuccess, mode, row
           <div className='col-2'>
           </div>
           <div className='col-8 text-center'>
-            <h2>{mode == 'add' ? 'Add' : 'Update'} Staff</h2>
+            <h2>{mode == 'add' ? 'Add' : 'Update'} Patient</h2>
           </div>
           <div className='col-2'>
             <span className="close" onClick={onClose}>&times;</span>
@@ -235,4 +235,4 @@ const EnrollStaff: React.FC<EnrollStaffProps> = ({ onClose, onSuccess, mode, row
   );
 };
 
-export default EnrollStaff;
+export default EnrollPatient;

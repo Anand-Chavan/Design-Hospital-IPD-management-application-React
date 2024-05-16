@@ -65,13 +65,19 @@ const ListStaff = () => {
   const [selectedRow, setSelectedRow] = useState<SelectedRow | null>(null);
 
 
-
   useEffect(() => {
-    getStaffDetails().then((resp: any) => {
-      setStaffDetails(resp.staff)
-      setIsLoading(false);
-    })
-  }, [])
+    const fetchStaffDetails = async () => {
+      try {
+        const resp = await getStaffDetails();
+        setStaffDetails(resp.staff);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error fetching room details:', error);
+        setIsLoading(false);
+      }
+    };
+    fetchStaffDetails();
+  }, []);
 
   const handleSuccess = (newStaff: any[]) => {
     getStaffDetails().then((resp: any) => {

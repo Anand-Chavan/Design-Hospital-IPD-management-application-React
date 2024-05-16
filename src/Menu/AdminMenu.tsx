@@ -8,6 +8,12 @@ interface Components {
 const components: Components = {
     ManageRooms: React.lazy(() => import('../Components/Admin/ManageRooms')),
     ListStaff: React.lazy(() => import('../Components/Admin/ListStaff')),
+    
+
+    ListPatient: React.lazy(() => import('../Components/Admin/ListPatient')),
+    ManageAdmissions: React.lazy(() => import('../Components/Staff/ManageAdmissions')),
+    ListMedicines: React.lazy(() => import('../Components/Staff/ListMedicines')),
+    
 };
 
 export default components;

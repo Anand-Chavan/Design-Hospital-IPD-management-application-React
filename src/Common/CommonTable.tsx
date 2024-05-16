@@ -1,23 +1,31 @@
 import React, { useMemo, useState } from 'react';
 import { useTable, usePagination } from 'react-table';
-import { FaEdit, FaTrash } from 'react-icons/fa'; // Import Font Awesome icons
-import '../Styles/CommonTable.css'
+import { FaEdit, FaTrash, FaDownload } from 'react-icons/fa'; // Import Font Awesome icons
+import '../Styles/CommonTable.css';
 import DeleteConfirmation from './DeleteConfirmation';
+import '../Styles/Room.css';
+
 
 interface CommonTableProps {
   columns: any[];
   data: any[];
   handleEdit?: (rowData: any) => void; // Make handleEdit optional
   handleDelete?: (rowData: any) => void; // Make handleDelete optional
+  downloadInvoice?: (rowData: any) => void; // Make download optional
 }
 
-const CommonTable: React.FC<CommonTableProps> = ({ columns, data, handleEdit, handleDelete }) => {
+const CommonTable: React.FC<CommonTableProps> = ({ columns, data, handleEdit, handleDelete,downloadInvoice }) => {
   const [showModal, setShowModal] = useState(false);
-  const [selectedRow, setSelectedRow] = useState();
+  const [selectedRow, setSelectedRow] = useState<any>(null); // Specify type for selectedRow
 
+  const downloadInvoiceIn = (rowData: any) => {
+    setSelectedRow(rowData);
+    if (downloadInvoice) {
+      downloadInvoice(rowData);
+    }  
+  };
 
   const handleDeleteIn = () => {
-    console.log('Item deleted', selectedRow);
     setShowModal(false);
     if (handleDelete) {
       handleDelete(selectedRow);
@@ -27,7 +35,7 @@ const CommonTable: React.FC<CommonTableProps> = ({ columns, data, handleEdit, ha
   const openDialogForDelete = (rowData: any) => {
     setShowModal(true);
     setSelectedRow(rowData);
-  }
+  };
 
   const columnsWithActions = useMemo(() => {
     const actionsColumn = {
@@ -40,6 +48,9 @@ const CommonTable: React.FC<CommonTableProps> = ({ columns, data, handleEdit, ha
           )}
           {handleDelete && (
             <FaTrash onClick={() => openDialogForDelete(row.original)} className='action-button cp' />
+          )}
+           {handleDelete && (
+            <FaDownload onClick={() => downloadInvoiceIn(row.original)} className='action-button cp' />
           )}
         </div>
       ),
@@ -70,52 +81,58 @@ const CommonTable: React.FC<CommonTableProps> = ({ columns, data, handleEdit, ha
   ) as any;
 
   return (
-    <div>
-      <table {...getTableProps()} className="common-table">
-        <thead>
-          {headerGroups.map((headerGroup: any) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column: any) => (
-                <th {...column.getHeaderProps()}>{column.render('Header')}</th>
+    <div className="common-table">
+      {data.length === 0 ? (
+        <p style={{ textAlign: 'center', fontSize: '1.2rem', color: '#777', marginTop: '20px' }}>No data found</p>
+      ) : (
+        <>
+          <table {...getTableProps()}>
+            <thead>
+              {headerGroups.map((headerGroup: any) => (
+                <tr {...headerGroup.getHeaderGroupProps()}>
+                  {headerGroup.headers.map((column: any) => (
+                    <th {...column.getHeaderProps()}>{column.render('Header')}</th>
+                  ))}
+                </tr>
               ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-          {page.map((row: any) => {
-            prepareRow(row);
-            return (
-              <tr {...row.getRowProps()}>
-                {row.cells.map((cell: any) => (
-                  <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
-                ))}
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      <div className="pagination">
-        <button onClick={() => previousPage()} disabled={!canPreviousPage}>
-          Previous
-        </button>{' '}
-        <button onClick={() => nextPage()} disabled={!canNextPage}>
-          Next
-        </button>{' '}
-        <span>
-          Page{' '}
-          <strong>
-            {pageIndex + 1} of {pageOptions.length}
-          </strong>{' '}
-        </span>
-      </div>
+            </thead>
+            <tbody {...getTableBodyProps()}>
+              {page.map((row: any) => {
+                prepareRow(row);
+                return (
+                  <tr {...row.getRowProps()}>
+                    {row.cells.map((cell: any) => (
+                      <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                    ))}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          <div className="pagination">
+            <button onClick={() => previousPage()} disabled={!canPreviousPage}>
+              Previous
+            </button>{' '}
+            <button onClick={() => nextPage()} disabled={!canNextPage}>
+              Next
+            </button>{' '}
+            <span>
+              Page{' '}
+              <strong>
+                {pageIndex + 1} of {pageOptions.length}
+              </strong>{' '}
+            </span>
+          </div>
 
-      {showModal ? (
-        <DeleteConfirmation
-          show={showModal}
-          onHide={() => setShowModal(false)}
-          onDeleteConfirm={handleDeleteIn}
-        />
-      ):(<></>)}
+          {showModal && (
+            <DeleteConfirmation
+              show={showModal}
+              onHide={() => setShowModal(false)}
+              onDeleteConfirm={handleDeleteIn}
+            />
+          )}
+        </>
+      )}
     </div>
   );
 };
