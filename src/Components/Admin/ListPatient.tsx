@@ -82,7 +82,6 @@ const ListPatient = () => {
     const handleEdit = (row: SelectedRow | undefined) => {
         setMode('edit')
         setIsDialogOpen(true)
-        console.log(row, mode)
         if (row)
             setSelectedRow(row)
     }
@@ -90,9 +89,7 @@ const ListPatient = () => {
     const handleDelete = (row: SelectedRow | undefined) => {
         if (row != undefined) {
             setSelectedRow(row);
-            console.log(row)
             if (selectedRow?.user_id != undefined) {
-                console.log(selectedRow)
                 deletePatientDetails(selectedRow?.user_id).then(() => {
                     setIsLoading(true);
                     getPatientDetails().then((resp: any) => {
@@ -130,7 +127,7 @@ const ListPatient = () => {
                     <div className="loader"></div>
                 </div>
             )}
-            <ToastContainer position="top-left"
+            <ToastContainer position="top-right"
                 autoClose={5000}
                 toastStyle={{ width: '400px' }}
                 hideProgressBar={false}

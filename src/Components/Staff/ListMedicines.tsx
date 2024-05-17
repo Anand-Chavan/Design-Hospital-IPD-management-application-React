@@ -111,7 +111,7 @@ const ListMedicines = () => {
         </div>
       )}
       <ToastContainer
-        position="top-left"
+        position="top-right"
         autoClose={5000}
         toastStyle={{ width: '400px' }}
         hideProgressBar={false}

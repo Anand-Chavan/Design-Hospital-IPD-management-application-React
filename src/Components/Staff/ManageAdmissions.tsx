@@ -9,6 +9,7 @@ import { AdminLogin } from '../../Utils/ApiRes';
 import EnrollAdmission from './EnrollAdmission';
 import { AdmissionData, AdmissionDetail, InvoiceData } from '../../Utils/interface';
 import InvoicePopup from './InvoicePopup';
+import TreatmentForm from './TreatmentForm';
 
 // Sample object structure for admission
 const admissionObj = {
@@ -113,6 +114,7 @@ const ManageAdmissions = () => {
   const [loginData, setLoginData] = useState<AdminLogin | null>(null);
   const [showInvoice, setShowInvoice] = useState(false);
   const [invoiceData, setInvoiceData] = useState<InvoiceData>(sampleData);
+  const [showPopup, setShowPopup] = useState(false);
 
 
   const handleCloseInvoice = () => {
@@ -160,12 +162,15 @@ const ManageAdmissions = () => {
     }
   };
 
+  const showTretment = (row: any) => {
+    setSelectedRow(row)
+    setShowPopup(true);
+  }
+
   const handleDelete = (row: SelectedRow | undefined) => {
-    console.log(row);
     if (row) {
       setSelectedRow(row);
       if (selectedRow?.id) {
-        console.log(selectedRow)
         deleteAdmissionDetails(selectedRow.id).then(() => {
           setIsLoading(true);
           getAdmissionDetails().then((resp: any) => {
@@ -201,6 +206,7 @@ const ManageAdmissions = () => {
                   handleEdit={handleEdit}
                   handleDelete={handleDelete}
                   downloadInvoice={downloadInvoice}
+                  showTretment={showTretment}
                 />
               ) : (
                 <CommonTable
@@ -218,8 +224,8 @@ const ManageAdmissions = () => {
         </div>
       )}
       <ToastContainer
-        position="top-left"
-        autoClose={5000}
+        position="top-right"
+        autoClose={2000}
         toastStyle={{ width: '400px' }}
         hideProgressBar={false}
         newestOnTop={false}
@@ -233,6 +239,8 @@ const ManageAdmissions = () => {
       {showInvoice && (
         <InvoicePopup invoiceData={invoiceData} onClose={handleCloseInvoice} />
       )}
+      {showPopup && <TreatmentForm selectedRow={selectedRow}  onClose={() => setShowPopup(false)} />}
+
     </div>
   );
 };

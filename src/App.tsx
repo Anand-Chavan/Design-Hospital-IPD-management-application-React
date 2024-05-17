@@ -10,7 +10,7 @@ import { AdminLogin } from './Utils/ApiRes';
 import { toast } from 'react-toastify';
 import { UserDetails } from './Utils/interface';
 
-const getUserDetailsById = async (id:number) => {
+const getUserDetailsById = async (id: number) => {
   let responseFromApi!: UserDetails;
   try {
     const response = await fetch(`http://localhost:3000/user_details/${id}`, {
@@ -40,8 +40,6 @@ function App() {
   const [loginData, setLoginData] = useState<AdminLogin | null>(null);
   const [loadInUserData, setLoggedInUsedData] = useState<UserDetails | null>(null);
 
-
-
   const handleLogin = (newToken: string, loginData: any) => {
     setToken(newToken);
     setLoginData(loginData);
@@ -57,33 +55,40 @@ function App() {
   };
 
   useEffect(() => {
-    let data = localStorage.getItem('loginData') as string;
-    setLoginData(JSON.parse(data));
-    setLoggedInUserDataIn()
+    if (loginData == null) {
+      let data = localStorage.getItem('loginData') as string;
+      setLoginData(JSON.parse(data));
+    }
   }, []);
 
-  const setLoggedInUserDataIn = async() =>{
-    if(loginData?.status.data.id)
+  const setLoggedInUserDataIn = async () => {
+    if (loginData?.status.data.id)
       setLoggedInUsedData(await getUserDetailsById(loginData?.status.data.id))
   }
 
   useEffect(() => {
-    if (loginData?.status.role === 'admin') {
-      setContent(AdminMenu[0].component);
-    } else if (loginData?.status.role === 'staff') {
-      setContent(StaffMenu[0].component);
-    } else {
-      // Handle other roles or no role scenario
+    if (content == '' && loginData) {
+      if (loginData?.status.role === 'admin') {
+        setContent(AdminMenu[0].component);
+      } else if (loginData?.status.role === 'staff') {
+        setContent(StaffMenu[0].component);
+      } else {
+        // Handle other roles or no role scenario
+      }
+      setLoggedInUserDataIn();
     }
   }, [loginData]);
 
   useEffect(() => {
-    renderComponent(content);
+    if (content == '' && loginData){
+      renderComponent(content);
+    }
   }, [content]);
 
 
   const handleRouteFromApp = (item: MenuItem) => {
-    setContent(item.component)
+    if (item.component != content && loginData)
+      setContent(item.component)
   };
 
   const renderComponent = (componentName: string) => {

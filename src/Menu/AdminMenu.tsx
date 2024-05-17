@@ -13,6 +13,9 @@ const components: Components = {
     ListPatient: React.lazy(() => import('../Components/Admin/ListPatient')),
     ManageAdmissions: React.lazy(() => import('../Components/Staff/ManageAdmissions')),
     ListMedicines: React.lazy(() => import('../Components/Staff/ListMedicines')),
+
+    PatientProfile: React.lazy(() => import('../Components/Patients/PatientProfile')),
+
     
 };
 

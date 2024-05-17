@@ -62,7 +62,6 @@ const EnrollRoom: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, rowDa
     });
 
     useEffect(() => {
-        console.log(mode, rowData);
         if (mode === 'edit') {
             const editObj = {
                 first_name: rowData?.first_name,
@@ -91,7 +90,6 @@ const EnrollRoom: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, rowDa
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(formData, mode);
         if (mode === 'add') handleAdd();
         if (mode === 'edit') handleEdit();
     };
@@ -116,7 +114,6 @@ const EnrollRoom: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, rowDa
                 body: JSON.stringify(requestBody),
             });
             const dataForUsers = await responseForUser.json();
-            console.log(dataForUsers)
             if (dataForUsers?.status?.errors && dataForUsers?.status?.errors?.length > 0) {
                 dataForUsers.status.errors.forEach((ele: string) => {
                     toast.success(ele)
@@ -187,7 +184,7 @@ const EnrollRoom: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, rowDa
                 </form>
             </div>
             <ToastContainer
-                position="top-left"
+                position="top-right"
                 autoClose={5000}
                 toastStyle={{ width: '400px' }}
                 hideProgressBar={false}

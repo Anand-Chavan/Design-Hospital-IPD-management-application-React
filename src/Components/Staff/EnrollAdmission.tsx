@@ -99,7 +99,6 @@ const EnrollAdmission: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, 
 
 
     useEffect(() => {
-        console.log(mode, rowData);
         if (mode === 'edit') {
             fetchAdmissionDataById(rowData?.id);
         }
@@ -165,7 +164,6 @@ const EnrollAdmission: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, 
                     setFormData(editObj);
                 }
             }
-            console.log(formData, apiResById)
         } catch (error) {
             console.error('Error fetching rooms data:', error);
         }
@@ -277,7 +275,7 @@ const EnrollAdmission: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, 
                 </form>
             </div>
             <ToastContainer
-                position="top-left"
+                position="top-right"
                 autoClose={5000}
                 toastStyle={{ width: '400px' }}
                 hideProgressBar={false}

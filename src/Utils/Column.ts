@@ -1,37 +1,37 @@
 export const StaffDetailsColumn = [
-    { Header: 'ID', accessor: 'id' },
-    { Header: 'First Name', accessor: 'first_name' },
-    { Header: 'Last Name', accessor: 'last_name' },
-    { Header: 'DOB', accessor: 'date_of_birth' },
-    { Header: 'Gender', accessor: 'gender' },
-    { Header: 'Phone', accessor: 'phone_no' },
-    { Header: 'Created At', accessor: 'created_at' },
-    { Header: 'Updated At', accessor: 'updated_at' }
+    { Header: 'ID', accessor: 'id', dataType: 'string' },
+    { Header: 'First Name', accessor: 'first_name', dataType: 'string' },
+    { Header: 'Last Name', accessor: 'last_name', dataType: 'string' },
+    { Header: 'DOB', accessor: 'date_of_birth', dataType: 'string' },
+    { Header: 'Gender', accessor: 'gender', dataType: 'string' },
+    { Header: 'Phone', accessor: 'phone_no', dataType: 'string' },
+    { Header: 'Created At', accessor: 'created_at', dataType: 'date' },
+    { Header: 'Updated At', accessor: 'updated_at', dataType: 'date' }
 ];
 
 export const RoomDetailsColumn = [
-    { Header: 'ID', accessor: 'id' },
-    { Header: 'Room Type', accessor: 'room_type' },
-    { Header: 'Description', accessor: 'description' },
-    { Header: 'Charges', accessor: 'charges' },
-    { Header: 'Capacity', accessor: 'capacity' },
-    { Header: 'Created At', accessor: 'created_at' },
-    { Header: 'Updated At', accessor: 'updated_at' },
+    { Header: 'ID', accessor: 'id', dataType: 'string' },
+    { Header: 'Room Type', accessor: 'room_type', dataType: 'string' },
+    { Header: 'Description', accessor: 'description', dataType: 'string' },
+    { Header: 'Charges', accessor: 'charges', dataType: 'string' },
+    { Header: 'Capacity', accessor: 'capacity', dataType: 'string' },
+    { Header: 'Created At', accessor: 'created_at', dataType: 'date' },
+    { Header: 'Updated At', accessor: 'updated_at', dataType: 'date' },
 ];
 
 export const AdmissionDetailsColumn = [
-    { Header: 'ID', accessor: 'id' },
-    { Header: 'Patient', accessor: 'patient' },
-    { Header: 'Staff', accessor: 'staff' },
-    { Header: 'Room', accessor: 'room' },
-    { Header: 'Diagnostic', accessor: 'dignostic' },
-    { Header: 'Admission Date', accessor: 'admission_date' },
+    { Header: 'ID', accessor: 'id', dataType: 'string' },
+    { Header: 'Patient', accessor: 'patient', dataType: 'string' },
+    { Header: 'Staff', accessor: 'staff', dataType: 'string' },
+    { Header: 'Room', accessor: 'room', dataType: 'string' },
+    { Header: 'Diagnostic', accessor: 'dignostic', dataType: 'string' },
+    { Header: 'Admission Date', accessor: 'admission_date', dataType: 'date' },
 ];
 
 export const MedicineDetailsColumn = [
-    { Header: 'ID', accessor: 'id' },
-    { Header: 'Name', accessor: 'name' },
-    { Header: 'Price', accessor: 'price' },
-    { Header: 'Created At', accessor: 'created_at' },
-    { Header: 'Updated At', accessor: 'updated_at' },
-  ]
+    { Header: 'ID', accessor: 'id', dataType: 'string' },
+    { Header: 'Name', accessor: 'name', dataType: 'string' },
+    { Header: 'Price', accessor: 'price', dataType: 'string' },
+    { Header: 'Created At', accessor: 'created_at', dataType: 'date' },
+    { Header: 'Updated At', accessor: 'updated_at', dataType: 'date' },
+];

@@ -66,20 +66,21 @@ const ManageRooms = () => {
   const [loginData, setLoginData] = useState<AdminLogin | null>(null);
 
   useEffect(() => {
-    const fetchRoomDetails = async () => {
-      try {
-        const resp = await getRoomDetails();
-        setRoomDetails(resp.data);
-        setLoginData(JSON.parse(localStorage.getItem('loginData') as string));
-      } catch (error) {
-        console.error('Error fetching room details:', error);
-        toast.error('Failed to fetch room details'); // Add a toast for error handling
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchRoomDetails();
+    if(roomDetails.length == 0){
+      const fetchRoomDetails = async () => {
+        try {
+          const resp = await getRoomDetails();
+          setRoomDetails(resp.data);
+          setLoginData(JSON.parse(localStorage.getItem('loginData') as string));
+        } catch (error) {
+          console.error('Error fetching room details:', error);
+          toast.error('Failed to fetch room details'); // Add a toast for error handling
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      fetchRoomDetails();
+    }
   }, []); // Empty dependency array for componentDidMount-like behavior
 
 
@@ -153,7 +154,7 @@ const ManageRooms = () => {
         </div>
       )}
       <ToastContainer
-        position="top-left"
+        position="top-right"
         autoClose={5000}
         toastStyle={{ width: '400px' }}
         hideProgressBar={false}

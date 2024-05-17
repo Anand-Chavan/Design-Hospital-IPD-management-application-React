@@ -90,7 +90,6 @@ const ListStaff = () => {
   const handleEdit = (row: SelectedRow | undefined) => {
     setMode('edit')
     setIsDialogOpen(true)
-    console.log(row, mode)
     if (row)
       setSelectedRow(row)
   }
@@ -98,9 +97,7 @@ const ListStaff = () => {
   const handleDelete = (row: SelectedRow | undefined) => {
     if (row != undefined) {
       setSelectedRow(row);
-      console.log(row)
       if (selectedRow?.user_id != undefined) {
-        console.log(selectedRow)
         deleteStaffDetails(selectedRow?.user_id).then(() => {
           setIsLoading(true);
           getStaffDetails().then((resp: any) => {
@@ -138,7 +135,7 @@ const ListStaff = () => {
           <div className="loader"></div>
         </div>
       )}
-      <ToastContainer position="top-left"
+      <ToastContainer position="top-right"
         autoClose={5000}
         toastStyle={{ width: '400px' }}
         hideProgressBar={false}

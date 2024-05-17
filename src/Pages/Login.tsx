@@ -75,7 +75,7 @@ const Login = ({ onLogin }:any) => {
                 </div>
                 <button type="submit">Login</button>
             </form>
-            <ToastContainer position="top-left"
+            <ToastContainer position="top-right"
                 autoClose={5000}
                 toastStyle={{ width: '400px' }}
                 hideProgressBar={false}
