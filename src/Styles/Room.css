@@ -33,6 +33,13 @@ tr:nth-child(even) {
     margin-top: 10px;
 }
 
+.error-message {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+
 .pagination button {
     margin-right: 5px;
     background-color: #4caf50;
@@ -97,6 +104,6 @@ tr:nth-child(even) {
     cursor: not-allowed;
 }
 
-button{
+button {
     width: 100px;
 }

@@ -3,6 +3,8 @@ import { Navbar, Container } from 'react-bootstrap';
 import { BiLogOut } from 'react-icons/bi';
 import { AdminLogin } from '../../Utils/ApiRes';
 import { UserDetails } from '../../Utils/interface';
+import { useDispatch } from 'react-redux';
+import { logout } from '../../Redux/Slices/AuthSlice';
 
 interface ComponentBProps {
     handleLogout: () => void;
@@ -11,8 +13,10 @@ interface ComponentBProps {
 }
 
 const Header: React.FC<ComponentBProps> = ({ handleLogout, loginData,loadInUserData }) => {
+    const dispatch = useDispatch();
     const handleLogoutButon = () =>{
-        handleLogout()
+        handleLogout();
+        dispatch(logout());
     }
     return (
         <Navbar style={{ backgroundColor: '#1976d2', color: '#ffffff' }}>

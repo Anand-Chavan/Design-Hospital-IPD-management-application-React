@@ -7,34 +7,17 @@ import { AdminMenu, MenuItem, StaffMenu } from './Utils/Constants';
 import { Suspense, useEffect, useState } from 'react';
 import components from './Menu/AdminMenu';
 import { AdminLogin } from './Utils/ApiRes';
-import { toast } from 'react-toastify';
 import { UserDetails } from './Utils/interface';
-
-const getUserDetailsById = async (id: number) => {
-  let responseFromApi!: UserDetails;
-  try {
-    const response = await fetch(`http://localhost:3000/user_details/${id}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: localStorage.getItem('token') as string,
-      },
-    });
-
-    if (response.ok) {
-      responseFromApi = await response.json();
-    } else {
-      toast.error('Something went wrong');
-    }
-  } catch (error) {
-    console.error('Error during loading:', error);
-    toast.error('Something went wrong');
-  }
-  return responseFromApi;
-};
-
+import { useSelector } from 'react-redux';
+import { RootState } from './Redux/Store';
+import { getUserDetailsById } from './Utils/GetUserDetailsById';
 
 function App() {
+  const isAuthenticated = useSelector((state: RootState) => {
+    console.log(state)
+    return state.auth.isAuthenticated
+  });
+
   const [content, setContent] = useState<string>('');
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [loginData, setLoginData] = useState<AdminLogin | null>(null);
@@ -107,7 +90,7 @@ function App() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      {token ? (
+      {isAuthenticated ? (
         <div >
           <Header loginData={loginData} loadInUserData={loadInUserData} handleLogout={handleLogout} />
           <div style={{ flex: '1 0 80%', display: 'flex', flexDirection: 'row' }}>

@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import '../../Styles/Modal.css';
 import '../../Styles/Room.css';
 import { ToastContainer, toast } from 'react-toastify';
+import axiosInstance from '../../Utils/AxiosConfig';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 
 interface EnrollPatientProps {
   onClose: () => void;
@@ -30,7 +33,7 @@ interface ApiResponseForUsers {
       updated_at: string;
       jti: string;
     };
-    errors:[]
+    errors: []
   };
 }
 
@@ -46,6 +49,28 @@ const EnrollPatient: React.FC<EnrollPatientProps> = ({ onClose, onSuccess, mode,
     password: ''
   });
 
+  const initialValues = {
+    first_name: formData.first_name || '',
+    last_name: formData.last_name || '',
+    date_of_birth: formData.date_of_birth || '',
+    gender: formData.gender || '',
+    phone_no: formData.phone_no || '',
+    email: mode === 'add' ? formData.email || '' : '',
+    password: mode === 'add' ? formData.password || '' : '',
+  };
+
+  const validationSchema = Yup.object({
+    first_name: Yup.string().required('First Name is required'),
+    last_name: Yup.string().required('Last Name is required'),
+    date_of_birth: Yup.string().required('Date of Birth is required'),
+    gender: Yup.string().required('Gender is required'),
+    phone_no: Yup.string().required('Phone Number is required'),
+    ...(mode === 'add' && {
+      email: Yup.string().email('Invalid email format').required('Email is required'),
+      password: Yup.string().required('Password is required'),
+    }),
+  });
+
   useEffect(() => {
     if (mode == 'edit') {
       const editObj = {
@@ -58,19 +83,19 @@ const EnrollPatient: React.FC<EnrollPatientProps> = ({ onClose, onSuccess, mode,
         password: '',
       }
       setFormData(editObj)
+      console.log(rowData, mode,formData);
     }
   }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prevData => ({
-      ...prevData,
-      [name]: value
-    }));
+    // const { name, value } = e.target;
+    // setFormData(prevData => ({
+    //   ...prevData,
+    //   [name]: value
+    // }));
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async (e: any) => {
     if (mode == 'add')
       handleAdd();
     if (mode == 'edit')
@@ -87,17 +112,11 @@ const EnrollPatient: React.FC<EnrollPatientProps> = ({ onClose, onSuccess, mode,
           "password": formData.password
         }
       }
-      const responseForUser = await fetch('http://localhost:3000/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': localStorage.getItem('token') as string
-        },
-        body: JSON.stringify(requestBody),
-      });
-      const dataForUsers: ApiResponseForUsers = await responseForUser.json();
-      if(dataForUsers.status.errors && dataForUsers.status.errors.length>0){
-        dataForUsers.status.errors.forEach((ele:string)=>{
+
+      const response = await axiosInstance.post(`/users`, JSON.stringify(requestBody));
+      const dataForUsers: ApiResponseForUsers = response.data;
+      if (dataForUsers.status.errors && dataForUsers.status.errors.length > 0) {
+        dataForUsers.status.errors.forEach((ele: string) => {
           toast.success(ele)
         })
       }
@@ -110,24 +129,30 @@ const EnrollPatient: React.FC<EnrollPatientProps> = ({ onClose, onSuccess, mode,
           "gender": formData.gender,
           "phone_no": formData.phone_no,
           "user_id": dataForUsers.status.data.id,
-          "role_id": 3
+          "role_id": 3,
+          "email": formData.email,
+          "password": formData.password
         }
       }
 
-      const responseForUserDetails = await fetch('http://localhost:3000/user_details', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': localStorage.getItem('token') as string
-        },
-        body: JSON.stringify(requestBodyForUserDetails),
-      });
-      const dataForUserDetails = await responseForUserDetails.json();
+      const responseForUserDetails = await axiosInstance.put(`/user_details`, JSON.stringify(requestBodyForUserDetails));
+      const dataForUserDetails = responseForUserDetails.data
       onSuccess(dataForUserDetails);
       toast.success('User Added successful!');
       onClose();
-    } catch (error) {
-      console.error('Error adding Patient:', error);
+    } catch (error: any) {
+      if (error.response) {
+        const dataForUsers = error.response
+        if (dataForUsers.status.errors && dataForUsers.status.errors.length > 0) {
+          dataForUsers.status.errors.forEach((ele: string) => {
+            toast.success(ele)
+          })
+        }
+      } else if (error.request) {
+        console.log(error.request);
+      } else {
+        console.log('Error message:', error.message);
+      }
     }
   }
 
@@ -144,15 +169,7 @@ const EnrollPatient: React.FC<EnrollPatientProps> = ({ onClose, onSuccess, mode,
           "role_id": 3
         }
       }
-      const responseForUserDetails = await fetch(`http://localhost:3000/user_details/${rowData.user_id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': localStorage.getItem('token') as string
-        },
-
-        body: JSON.stringify(requestBodyForUserDetails),
-      });
+      const responseForUserDetails = await axiosInstance.put(`/user_details`, JSON.stringify(requestBodyForUserDetails));
       onSuccess(responseForUserDetails);
       toast.success('User Updated successful!');
       onClose();
@@ -167,55 +184,61 @@ const EnrollPatient: React.FC<EnrollPatientProps> = ({ onClose, onSuccess, mode,
     <div className="modal" style={{ display: 'block' }}>
       <div className="modal-content">
         <div className='row'>
-          <div className='col-2'>
-          </div>
+          <div className='col-2'></div>
           <div className='col-8 text-center'>
-            <h2>{mode == 'add' ? 'Add' : 'Update'} Patient</h2>
+            <h2>{mode === 'add' ? 'Add' : 'Update'} Patient</h2>
           </div>
           <div className='col-2'>
             <span className="close" onClick={onClose}>&times;</span>
           </div>
         </div>
-        <form onSubmit={handleSubmit}>
-          <div className="input-group">
-            <input type="text" name="first_name" value={formData.first_name} onChange={handleChange} placeholder="First Name" />
-          </div>
-          <div className="input-group">
-            <input type="text" name="last_name" value={formData.last_name} onChange={handleChange} placeholder="Last Name" />
-          </div>
-          <div className="input-group">
-            <input type="text" name="date_of_birth" value={formData.date_of_birth} onChange={handleChange} placeholder="Date of Birth" />
-          </div>
-          <div className="input-group">
-            <input type="text" name="gender" value={formData.gender} onChange={handleChange} placeholder="Gender" />
-          </div>
-          <div className="input-group">
-            <input type="text" name="phone_no" value={formData.phone_no} onChange={handleChange} placeholder="Phone Number" />
-          </div>
-          {mode === 'add' && (
-            <>
+        <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={(values) => {
+            handleSubmit(values);
+          }}
+        >
+          {({ isSubmitting }) => (
+            <Form>
               <div className="input-group">
-                <input
-                  type="text"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="Email"
-                />
+                <Field type="text" name="first_name" placeholder="First Name" onChange={handleChange} />
+                <ErrorMessage name="first_name" component="div" className="error-message" />
               </div>
               <div className="input-group">
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Password"
-                />
+                <Field type="text" name="last_name" placeholder="Last Name" onChange={handleChange} />
+                <ErrorMessage name="last_name" component="div" className="error-message" />
               </div>
-            </>
+              <div className="input-group">
+                <Field type="text" name="date_of_birth" placeholder="Date of Birth" onChange={handleChange} />
+                <ErrorMessage name="date_of_birth" component="div" className="error-message" />
+              </div>
+              <div className="input-group">
+                <Field type="text" name="gender" placeholder="Gender" onChange={handleChange} />
+                <ErrorMessage name="gender" component="div" className="error-message" />
+              </div>
+              <div className="input-group">
+                <Field type="text" name="phone_no" placeholder="Phone Number" onChange={handleChange} />
+                <ErrorMessage name="phone_no" component="div" className="error-message" />
+              </div>
+              {mode === 'add' && (
+                <>
+                  <div className="input-group">
+                    <Field type="text" name="email" placeholder="Email" />
+                    <ErrorMessage name="email" component="div" className="error-message" />
+                  </div>
+                  <div className="input-group">
+                    <Field type="password" name="password" placeholder="Password" />
+                    <ErrorMessage name="password" component="div" className="error-message" />
+                  </div>
+                </>
+              )}
+              <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                Submit
+              </button>
+            </Form>
           )}
-          <button type="submit" className="btn btn-primary">Submit</button>
-        </form>
+        </Formik>
       </div>
       <ToastContainer position="top-right"
         autoClose={5000}
