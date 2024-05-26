@@ -181,7 +181,7 @@ const EnrollPatient: React.FC<EnrollPatientProps> = ({ onClose, onSuccess, mode,
 
   return (
 
-    <div className="modal" style={{ display: 'block' }}>
+    <div className="modal">
       <div className="modal-content">
         <div className='row'>
           <div className='col-2'></div>

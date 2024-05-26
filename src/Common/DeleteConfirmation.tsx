@@ -11,7 +11,7 @@ type DeleteConfirmationModalProps = {
 const DeleteConfirmation: FC<DeleteConfirmationModalProps> = ({ show, onHide, onDeleteConfirm }) => {
 
     return (
-        <div className="modal" style={{ display: 'block' }}>
+        <div className="modal">
             <div className="modal-content">
                 <div className='row'>
                     <div className='col-1'></div>
