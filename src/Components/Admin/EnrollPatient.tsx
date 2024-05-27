@@ -5,6 +5,9 @@ import { ToastContainer, toast } from 'react-toastify';
 import axiosInstance from '../../Utils/AxiosConfig';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { postUserDetails, updateUserDetails } from '../../Redux/Slices/UserDetailSlice';
+import { AppDispatch } from '../../Redux/Store';
+import { useDispatch } from 'react-redux';
 
 interface EnrollPatientProps {
   onClose: () => void;
@@ -38,6 +41,7 @@ interface ApiResponseForUsers {
 }
 
 const EnrollPatient: React.FC<EnrollPatientProps> = ({ onClose, onSuccess, mode, rowData }) => {
+  const dispatch = useDispatch<AppDispatch>(); // Use the AppDispatch type
   const [formData, setFormData] = useState<PatientData>({
     first_name: '',
     last_name: '',
@@ -102,8 +106,7 @@ const EnrollPatient: React.FC<EnrollPatientProps> = ({ onClose, onSuccess, mode,
         }
       };
 
-      const response = await axiosInstance.post(`/users`, JSON.stringify(requestBody));
-      const dataForUsers: ApiResponseForUsers = response.data;
+      const dataForUsers = await (await dispatch(updateUserDetails(requestBody))).payload;
       if (dataForUsers.status.errors && dataForUsers.status.errors.length > 0) {
         dataForUsers.status.errors.forEach((ele: string) => {
           toast.error(ele);
@@ -123,8 +126,7 @@ const EnrollPatient: React.FC<EnrollPatientProps> = ({ onClose, onSuccess, mode,
           }
         };
 
-        const responseForUserDetails = await axiosInstance.put(`/user_details`, JSON.stringify(requestBodyForUserDetails));
-        const dataForUserDetails = responseForUserDetails.data;
+        const dataForUserDetails = await (await dispatch(postUserDetails(requestBodyForUserDetails))).payload;
         onSuccess(dataForUserDetails);
         toast.success('User added successfully!');
         onClose();
