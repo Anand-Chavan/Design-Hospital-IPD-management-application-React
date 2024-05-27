@@ -62,7 +62,7 @@ const TreatmentForm = ({ onClose,selectedRow }: any) => {
 
     return (
         <div className="overlay">
-        <div className="modal">
+        <div className="modal" style={{display:'block'}}>
         <div className="invoice-header">
                 <h2>Treatment</h2>
                 <button onClick={onClose}>X</button>

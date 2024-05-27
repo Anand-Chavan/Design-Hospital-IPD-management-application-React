@@ -8,7 +8,6 @@ import Authenticated from './Authenticated';
 
 const MainContainer = () => {
     const isAuthenticated = useSelector((state: RootState) => {
-        console.log(state)
         return state.auth.isAuthenticated
     });
 

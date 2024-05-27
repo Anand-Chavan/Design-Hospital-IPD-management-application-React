@@ -156,7 +156,7 @@ const EnrollRoom: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, rowDa
     };
 
     return (
-        <div className="modal">
+        <div className="modal" style={{display:'block'}}>
             <div className="modal-content">
                 <div className='row'>
                     <div className='col-2'></div>

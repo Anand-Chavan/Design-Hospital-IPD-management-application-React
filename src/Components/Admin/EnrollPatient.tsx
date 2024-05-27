@@ -37,7 +37,6 @@ interface ApiResponseForUsers {
   };
 }
 
-
 const EnrollPatient: React.FC<EnrollPatientProps> = ({ onClose, onSuccess, mode, rowData }) => {
   const [formData, setFormData] = useState<PatientData>({
     first_name: '',
@@ -72,81 +71,71 @@ const EnrollPatient: React.FC<EnrollPatientProps> = ({ onClose, onSuccess, mode,
   });
 
   useEffect(() => {
-    if (mode == 'edit') {
+    if (mode === 'edit' && rowData) {
       const editObj = {
-        first_name: rowData?.first_name,
-        last_name: rowData?.last_name,
-        date_of_birth: rowData?.date_of_birth,
-        gender: rowData?.gender,
-        phone_no: rowData?.phone_no,
+        first_name: rowData.first_name,
+        last_name: rowData.last_name,
+        date_of_birth: rowData.date_of_birth,
+        gender: rowData.gender,
+        phone_no: rowData.phone_no,
         email: '',
         password: '',
-      }
-      setFormData(editObj)
-      console.log(rowData, mode,formData);
+      };
+      setFormData(editObj);
     }
-  }, [])
+  }, [mode, rowData]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // const { name, value } = e.target;
-    // setFormData(prevData => ({
-    //   ...prevData,
-    //   [name]: value
-    // }));
+  const handleSubmit = async (values: any) => {
+    if (mode === 'add') {
+      await handleAdd(values);
+    } else if (mode === 'edit') {
+      await handleEdit(values);
+    }
   };
 
-  const handleSubmit = async (e: any) => {
-    if (mode == 'add')
-      handleAdd();
-    if (mode == 'edit')
-      handleEdit();
-  };
-
-
-
-  const handleAdd = async () => {
+  const handleAdd = async (values: any) => {
     try {
       const requestBody = {
-        "user": {
-          "email": formData.email,
-          "password": formData.password
+        user: {
+          email: values.email,
+          password: values.password
         }
-      }
+      };
 
       const response = await axiosInstance.post(`/users`, JSON.stringify(requestBody));
       const dataForUsers: ApiResponseForUsers = response.data;
       if (dataForUsers.status.errors && dataForUsers.status.errors.length > 0) {
         dataForUsers.status.errors.forEach((ele: string) => {
-          toast.success(ele)
-        })
-      }
+          toast.error(ele);
+        });
+      } else {
+        const requestBodyForUserDetails = {
+          user_detail: {
+            first_name: values.first_name,
+            last_name: values.last_name,
+            date_of_birth: values.date_of_birth,
+            gender: values.gender,
+            phone_no: values.phone_no,
+            user_id: dataForUsers.status.data.id,
+            role_id: 3,
+            email: values.email,
+            password: values.password
+          }
+        };
 
-      const requestBodyForUserDetails = {
-        "user_detail": {
-          "first_name": formData.first_name,
-          "last_name": formData.last_name,
-          "date_of_birth": formData.date_of_birth,
-          "gender": formData.gender,
-          "phone_no": formData.phone_no,
-          "user_id": dataForUsers.status.data.id,
-          "role_id": 3,
-          "email": formData.email,
-          "password": formData.password
-        }
+        const responseForUserDetails = await axiosInstance.put(`/user_details`, JSON.stringify(requestBodyForUserDetails));
+        const dataForUserDetails = responseForUserDetails.data;
+        onSuccess(dataForUserDetails);
+        toast.success('User added successfully!');
+        onClose();
       }
-
-      const responseForUserDetails = await axiosInstance.put(`/user_details`, JSON.stringify(requestBodyForUserDetails));
-      const dataForUserDetails = responseForUserDetails.data
-      onSuccess(dataForUserDetails);
-      toast.success('User Added successful!');
-      onClose();
     } catch (error: any) {
       if (error.response) {
-        const dataForUsers = error.response
+        const dataForUsers = error.response;
         if (dataForUsers.status.errors && dataForUsers.status.errors.length > 0) {
           dataForUsers.status.errors.forEach((ele: string) => {
-            toast.success(ele)
-          })
+            toast.error(ele);
+          });
         }
       } else if (error.request) {
         console.log(error.request);
@@ -154,34 +143,33 @@ const EnrollPatient: React.FC<EnrollPatientProps> = ({ onClose, onSuccess, mode,
         console.log('Error message:', error.message);
       }
     }
-  }
+  };
 
-  const handleEdit = async () => {
+  const handleEdit = async (values: any) => {
     try {
       const requestBodyForUserDetails = {
-        "user_detail": {
-          "first_name": formData.first_name,
-          "last_name": formData.last_name,
-          "date_of_birth": formData.date_of_birth,
-          "gender": formData.gender,
-          "phone_no": formData.phone_no,
-          "user_id": rowData.user_id,
-          "role_id": 3
+        user_detail: {
+          first_name: values.first_name,
+          last_name: values.last_name,
+          date_of_birth: values.date_of_birth,
+          gender: values.gender,
+          phone_no: values.phone_no,
+          user_id: rowData.user_id,
+          role_id: 3
         }
-      }
+      };
+
       const responseForUserDetails = await axiosInstance.put(`/user_details`, JSON.stringify(requestBodyForUserDetails));
-      onSuccess(responseForUserDetails);
-      toast.success('User Updated successful!');
+      onSuccess(responseForUserDetails.data);
+      toast.success('User updated successfully!');
       onClose();
     } catch (error) {
-      console.error('Error adding Patient:', error);
+      console.error('Error updating Patient:', error);
     }
-  }
-
+  };
 
   return (
-
-    <div className="modal">
+    <div className="modal" style={{ display: 'block' }}>
       <div className="modal-content">
         <div className='row'>
           <div className='col-2'></div>
@@ -195,30 +183,31 @@ const EnrollPatient: React.FC<EnrollPatientProps> = ({ onClose, onSuccess, mode,
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
-          onSubmit={(values) => {
-            handleSubmit(values);
+          onSubmit={(values, { setSubmitting }) => {
+            handleSubmit(values).finally(() => setSubmitting(false));
           }}
+          enableReinitialize
         >
           {({ isSubmitting }) => (
             <Form>
               <div className="input-group">
-                <Field type="text" name="first_name" placeholder="First Name" onChange={handleChange} />
+                <Field type="text" name="first_name" placeholder="First Name" />
                 <ErrorMessage name="first_name" component="div" className="error-message" />
               </div>
               <div className="input-group">
-                <Field type="text" name="last_name" placeholder="Last Name" onChange={handleChange} />
+                <Field type="text" name="last_name" placeholder="Last Name" />
                 <ErrorMessage name="last_name" component="div" className="error-message" />
               </div>
               <div className="input-group">
-                <Field type="text" name="date_of_birth" placeholder="Date of Birth" onChange={handleChange} />
+                <Field type="text" name="date_of_birth" placeholder="Date of Birth" />
                 <ErrorMessage name="date_of_birth" component="div" className="error-message" />
               </div>
               <div className="input-group">
-                <Field type="text" name="gender" placeholder="Gender" onChange={handleChange} />
+                <Field type="text" name="gender" placeholder="Gender" />
                 <ErrorMessage name="gender" component="div" className="error-message" />
               </div>
               <div className="input-group">
-                <Field type="text" name="phone_no" placeholder="Phone Number" onChange={handleChange} />
+                <Field type="text" name="phone_no" placeholder="Phone Number" />
                 <ErrorMessage name="phone_no" component="div" className="error-message" />
               </div>
               {mode === 'add' && (
@@ -240,7 +229,8 @@ const EnrollPatient: React.FC<EnrollPatientProps> = ({ onClose, onSuccess, mode,
           )}
         </Formik>
       </div>
-      <ToastContainer position="top-right"
+      <ToastContainer
+        position="top-right"
         autoClose={5000}
         toastStyle={{ width: '400px' }}
         hideProgressBar={false}
@@ -250,7 +240,8 @@ const EnrollPatient: React.FC<EnrollPatientProps> = ({ onClose, onSuccess, mode,
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="light"></ToastContainer>
+        theme="light"
+      />
     </div>
   );
 };

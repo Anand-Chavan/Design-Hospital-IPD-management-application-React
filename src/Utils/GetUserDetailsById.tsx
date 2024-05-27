@@ -6,7 +6,6 @@ export const getUserDetailsById = async (id: number) => {
     let responseFromApi!: UserDetails;
     try {
         const response = await axiosInstance.get(`/user_details/${id}`);
-        console.log(response);
         if (response.status === 200) {
             responseFromApi = await response.data;
         } else {
