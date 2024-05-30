@@ -103,8 +103,8 @@ const CommonTable: React.FC<CommonTableProps> = ({ columns, data, handleEdit, ha
         <>
           <table {...getTableProps()}>
             <thead>
-              {headerGroups.map((headerGroup: any) => (
-                <tr {...headerGroup.getHeaderGroupProps()}>
+              {headerGroups.map((headerGroup: any,index:number) => (
+                <tr key={index} {...headerGroup.getHeaderGroupProps()}>
                   {headerGroup.headers.map((column: any) => (
                     <th {...column.getHeaderProps()}>{column.render('Header')}</th>
                   ))}
@@ -112,10 +112,10 @@ const CommonTable: React.FC<CommonTableProps> = ({ columns, data, handleEdit, ha
               ))}
             </thead>
             <tbody {...getTableBodyProps()}>
-              {page.map((row: any) => {
+              {page.map((row: any,index:number) => {
                 prepareRow(row);
                 return (
-                  <tr {...row.getRowProps()}>
+                  <tr key={index} {...row.getRowProps()}>
                     {row.cells.map((cell: any) => (
                       // <td  {...cell.getCellProps()}>{cell.render('Cell')}</td>
                       <td {...cell.getCellProps()}>
