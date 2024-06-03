@@ -61,7 +61,7 @@ const CommonTable: React.FC<CommonTableProps> = ({ columns, data, handleEdit, ha
       Header: 'Treatment',
       accessor: 'treatment',
       Cell: ({ row }: any) => (
-        <div className='text-center'>
+        <div>
           {showTretment && <FaPlusCircle onClick={() => showTretment(row.original)} className='action-button cp m-1' />}
         </div>
       ),

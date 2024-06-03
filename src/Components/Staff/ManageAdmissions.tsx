@@ -194,7 +194,7 @@ const ManageAdmissions = () => {
                 <h2>Admission Details</h2>
               </div>
               <div className="col-md-4">
-                <button style={{ float: 'right' }} onClick={() => { setIsDialogOpen(true); setMode('add'); }}>Add Admission</button>
+                <button style={{ float: 'right',width:'140px' }} onClick={() => { setIsDialogOpen(true); setMode('add'); }}>Add Admission</button>
               </div>
             </div>
             <div className="row m-2">

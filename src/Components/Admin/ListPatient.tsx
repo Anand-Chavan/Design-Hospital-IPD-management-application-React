@@ -114,7 +114,7 @@ const ListPatient = () => {
                                 <h2>Patient Details</h2>
                             </div>
                             <div className="col-md-4">
-                                <button style={{ float: 'right' }} onClick={() => { setIsDialogOpen(true); setMode('add'); }}>Add Patient</button>
+                                <button  style={{ float: 'right',width:'140px' }} onClick={() => { setIsDialogOpen(true); setMode('add'); }}>Add Patient</button>
                             </div>
                         </div>
                         <div className="row m-2">
