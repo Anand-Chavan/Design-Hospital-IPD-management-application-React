@@ -6,25 +6,19 @@ import { AdminLogin } from "../Utils/ApiRes";
 import { getUserDetailsById } from "../Utils/GetUserDetailsById";
 import { MenuItem } from "../Utils/Constants";
 import { UserDetails } from "../Utils/interface";
-import { AdminMenu, StaffMenu } from '../Utils/Constants';
+import { AdminMenu, StaffMenu, PatientMenu } from '../Utils/Constants';
 import Footer from "../Components/Common/Footer";
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+
 
 const Authenticated = () => {
     const [loginData, setLoginData] = useState<AdminLogin | null>(null);
-    const [token, setToken] = useState(localStorage.getItem('token'));
     const [loadInUserData, setLoggedInUsedData] = useState<UserDetails | null>(null);
     const [content, setContent] = useState<string>('');
+    const [selectedMenuItem,setSelectedMenuItem] = useState<MenuItem>();
 
-
-    const handleLogin = (newToken: string, loginData: any) => {
-        setToken(newToken);
-        setLoginData(loginData);
-        localStorage.setItem('token', newToken);
-        localStorage.setItem('loginData', JSON.stringify(loginData));
-    };
 
     const handleLogout = () => {
-        setToken(null);
         localStorage.removeItem('token');
         localStorage.removeItem('loginData');
         setContent('')
@@ -37,7 +31,7 @@ const Authenticated = () => {
         }
     }, []);
 
-    
+
     const setLoggedInUserDataIn = async () => {
         if (loginData?.status.data.id)
             setLoggedInUsedData(await getUserDetailsById(loginData?.status.data.id))
@@ -66,19 +60,25 @@ const Authenticated = () => {
         const Component = components[componentName];
         if (Component) {
             return (
-                <Suspense fallback={<div>Loading...</div>}>
-                    <Component />
-                </Suspense>
+                <Router>
+                    <Suspense fallback={<div>Loading...</div>}>
+                        <Routes>
+                            <Route path={'/'} element={<Component />} />
+                        </Routes>
+                    </Suspense>
+                </Router>
             );
         }
         return null;
     };
 
     const handleRouteFromApp = (item: MenuItem) => {
-        if (item.component != content && loginData)
+        setSelectedMenuItem(item);
+        if (item.component != content && loginData){
             setContent(item.component)
+        }
     };
-    
+
     return (<>
         <Header loginData={loginData} loadInUserData={loadInUserData} handleLogout={handleLogout} />
         <div style={{ flex: '1 0 80%', display: 'flex', flexDirection: 'row' }}>

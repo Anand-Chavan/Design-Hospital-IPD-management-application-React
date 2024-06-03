@@ -4,7 +4,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import CommonTable from '../../Common/CommonTable';
 import { AdmissionDetailsColumn, RoomDetailsColumn } from '../../Utils/Column';
 import { SelectedRow } from '../../Utils/Constants';
-import '../../Styles/ListStaff.css';
 import { AdminLogin } from '../../Utils/ApiRes';
 import EnrollAdmission from './EnrollAdmission';
 import { AdmissionData, AdmissionDetail, InvoiceData } from '../../Utils/interface';
@@ -35,7 +34,7 @@ const downloadInvoiceAPI = async (id: number) => {
 
     if (response.ok) {
       responseFromApi = await response.json();
-      toast.success('Data fetch successful!');
+      // toast.success('Data fetch successful!');
     } else {
       toast.error('Something went wrong');
     }
@@ -60,7 +59,7 @@ const getAdmissionDetails = async () => {
     if (response.ok) {
       let responseFromApi: AdmissionData = await response.json();
       admissionDetails = responseFromApi.data;
-      toast.success('Data fetch successful!');
+      // toast.success('Data fetch successful!');
     } else {
       toast.error('Something went wrong');
     }

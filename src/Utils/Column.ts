@@ -1,4 +1,10 @@
-export const StaffDetailsColumn = [
+export interface Column {
+    Header:string,
+    accessor:string,
+    dataType:string
+}
+
+export const StaffDetailsColumn:Column[] = [
     { Header: 'ID', accessor: 'id', dataType: 'string' },
     { Header: 'First Name', accessor: 'first_name', dataType: 'string' },
     { Header: 'Last Name', accessor: 'last_name', dataType: 'string' },
@@ -9,7 +15,7 @@ export const StaffDetailsColumn = [
     { Header: 'Updated At', accessor: 'updated_at', dataType: 'date' }
 ];
 
-export const RoomDetailsColumn = [
+export const RoomDetailsColumn:Column[] = [
     { Header: 'ID', accessor: 'id', dataType: 'string' },
     { Header: 'Room Type', accessor: 'room_type', dataType: 'string' },
     { Header: 'Description', accessor: 'description', dataType: 'string' },
@@ -19,7 +25,7 @@ export const RoomDetailsColumn = [
     { Header: 'Updated At', accessor: 'updated_at', dataType: 'date' },
 ];
 
-export const AdmissionDetailsColumn = [
+export const AdmissionDetailsColumn:Column[] = [
     { Header: 'ID', accessor: 'id', dataType: 'string' },
     { Header: 'Patient', accessor: 'patient', dataType: 'string' },
     { Header: 'Staff', accessor: 'staff', dataType: 'string' },
@@ -35,3 +41,5 @@ export const MedicineDetailsColumn = [
     { Header: 'Created At', accessor: 'created_at', dataType: 'date' },
     { Header: 'Updated At', accessor: 'updated_at', dataType: 'date' },
 ];
+
+

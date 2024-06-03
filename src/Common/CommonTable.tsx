@@ -1,11 +1,11 @@
+// CommonTable.tsx
 import React, { useMemo, useState } from 'react';
 import { useTable, usePagination } from 'react-table';
-import { FaEdit, FaTrash, FaDownload, FaAd, FaPlusCircle } from 'react-icons/fa'; // Import Font Awesome icons
+import { FaEdit, FaTrash, FaDownload, FaPlusCircle } from 'react-icons/fa'; // Import Font Awesome icons
 import '../Styles/CommonTable.css';
 import DeleteConfirmation from './DeleteConfirmation';
 import '../Styles/Room.css';
 import { format } from 'date-fns';
-
 
 interface CommonTableProps {
   columns: any[];
@@ -13,10 +13,10 @@ interface CommonTableProps {
   handleEdit?: (rowData: any) => void; // Make handleEdit optional
   handleDelete?: (rowData: any) => void; // Make handleDelete optional
   downloadInvoice?: (rowData: any) => void; // Make download optional
-  showTretment?: (rowData: any) => void; 
+  showTretment?: (rowData: any) => void;
 }
 
-const CommonTable: React.FC<CommonTableProps> = ({ columns, data, handleEdit, handleDelete, downloadInvoice,showTretment }) => {
+const CommonTable: React.FC<CommonTableProps> = ({ columns, data, handleEdit, handleDelete, downloadInvoice, showTretment }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState<any>(null); // Specify type for selectedRow
 
@@ -62,16 +62,16 @@ const CommonTable: React.FC<CommonTableProps> = ({ columns, data, handleEdit, ha
       accessor: 'treatment',
       Cell: ({ row }: any) => (
         <div className='text-center'>
-            {showTretment &&<FaPlusCircle onClick={() => showTretment(row.original)} className='action-button cp m-1'/>}
+          {showTretment && <FaPlusCircle onClick={() => showTretment(row.original)} className='action-button cp m-1' />}
         </div>
       ),
     };
 
-    if(showTretment){
-      return [...columns, actionsColumn,actionsColumnWithTreatment ]
+    if (showTretment) {
+      return [...columns, actionsColumn, actionsColumnWithTreatment];
     }
     return handleEdit || handleDelete ? [...columns, actionsColumn] : columns;
-  }, [columns, handleEdit, handleDelete]);
+  }, [columns, handleEdit, handleDelete, showTretment]);
 
   const {
     getTableProps,
@@ -94,7 +94,6 @@ const CommonTable: React.FC<CommonTableProps> = ({ columns, data, handleEdit, ha
     usePagination
   ) as any;
 
-
   return (
     <div className="common-table">
       {data.length === 0 ? (
@@ -103,29 +102,41 @@ const CommonTable: React.FC<CommonTableProps> = ({ columns, data, handleEdit, ha
         <>
           <table {...getTableProps()}>
             <thead>
-              {headerGroups.map((headerGroup: any,index:number) => (
-                <tr key={index} {...headerGroup.getHeaderGroupProps()}>
-                  {headerGroup.headers.map((column: any) => (
-                    <th {...column.getHeaderProps()}>{column.render('Header')}</th>
+              {headerGroups.map((headerGroup: any, indexThead: number) => (
+                <tr key={indexThead} {...headerGroup.getHeaderGroupProps()}>
+                  {headerGroup.headers.map((column: any, indexTh: number) => (
+                    <th key={indexTh} {...column.getHeaderProps()}>{column.render('Header')}</th>
                   ))}
                 </tr>
               ))}
             </thead>
             <tbody {...getTableBodyProps()}>
-              {page.map((row: any,index:number) => {
+              {page.map((row: any,Header:number) => {
                 prepareRow(row);
                 return (
-                  <tr key={index} {...row.getRowProps()}>
-                    {row.cells.map((cell: any) => (
-                      // <td  {...cell.getCellProps()}>{cell.render('Cell')}</td>
-                      <td {...cell.getCellProps()}>
-                      {cell.column.dataType === 'date' ? (
-                        format(new Date(cell.value), 'MM/dd/yyyy') // Using date-fns format function
-                      ) : (
-                        cell.render('Cell')
-                      )}
-                    </td>
+                  <tr key={row.id} {...row.getRowProps()}>
+                    {/* {row.cells.map((cell: any, indexTd: number) => (
+                      <td key={indexTd} {...cell.getCellProps()}>
+                        {cell.column.dataType === 'date' ? (
+                          format(new Date(cell.value), 'MM/dd/yyyy')
+                        ) :(cell.column.accessor === 'id' ?(
+                          {indexTd}
+                        ):(cell.render('Cell')))}
+                      </td>
+                    ))} */}
+
+                    {row.cells.map((cell: any, indexTd: number) => (
+                      <td key={indexTd} {...cell.getCellProps()}>
+                        {cell.column.dataType === 'date' ? (
+                          format(new Date(cell.value), 'MM/dd/yyyy')
+                        ) : cell.column.Header === 'ID' ? (
+                          Header+1
+                        ) : (
+                          cell.render('Cell')
+                        )}
+                      </td>
                     ))}
+
                   </tr>
                 );
               })}

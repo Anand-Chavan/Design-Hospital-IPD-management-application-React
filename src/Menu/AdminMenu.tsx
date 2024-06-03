@@ -15,8 +15,6 @@ const components: Components = {
     ListMedicines: React.lazy(() => import('../Components/Staff/ListMedicines')),
 
     PatientProfile: React.lazy(() => import('../Components/Patients/PatientProfile')),
-
-    
 };
 
 export default components;

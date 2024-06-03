@@ -25,7 +25,8 @@ const PatientProfile = () => {
     const fetchPatientDetails = async () => {
       try {
         const loginData:AdminLogin = JSON.parse(localStorage.getItem('loginData') as string);
-        const response = await fetch(`http://localhost:3000/user_details/${(loginData?.status?.data?.id)}`);
+
+        const response = await fetch(`http://localhost:3000/user_details/${(26)}`);
         if (!response.ok) {
           throw new Error('Failed to fetch patient details');
         }

@@ -21,7 +21,7 @@ const getStaffDetails = async () => {
 
     if (response.ok) {
       staffDetails = await response.json();
-      toast.success('Data fetch successful!');
+      // toast.success('Data fetch successful!');
     } else {
       toast.error('Something went wrong');
     }
@@ -46,7 +46,7 @@ const deleteStaffDetails = async (userId: number) => {
 
     if (response.ok) {
       staffDetails = await response.json();
-      toast.success('Data fetch successful!');
+      // toast.success('Data fetch successful!');
     } else {
       toast.error('Something went wrong');
     }

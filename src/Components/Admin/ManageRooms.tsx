@@ -22,7 +22,7 @@ const getRoomDetails = async () => {
 
     if (response.ok) {
       roomDetails = await response.json();
-      toast.success('Data fetch successful!');
+      // toast.success('Data fetch successful!');
     } else {
       toast.error('Something went wrong');
     }

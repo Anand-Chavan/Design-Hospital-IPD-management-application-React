@@ -29,7 +29,7 @@ const getAdmissionDetails = async () => {
     if (response.ok) {
       let responseFromApi: MedicineAPIData = await response.json();
       admissionDetails = responseFromApi.data;
-      toast.success('Data fetch successful!');
+      // toast.success('Data fetch successful!');
     } else {
       toast.error('Something went wrong');
     }
