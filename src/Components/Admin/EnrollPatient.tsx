@@ -192,41 +192,43 @@ const EnrollPatient: React.FC<EnrollPatientProps> = ({ onClose, onSuccess, mode,
         >
           {({ isSubmitting }) => (
             <Form>
-              <div className="input-group">
-                <Field type="text" name="first_name" placeholder="First Name" />
-                <ErrorMessage name="first_name" component="div" className="error-message" />
+              <div className="form-container">
+                <div className="input-group">
+                  <Field type="text" name="first_name" placeholder="First Name" />
+                  <ErrorMessage name="first_name" component="div" className="error-message" />
+                </div>
+                <div className="input-group">
+                  <Field type="text" name="last_name" placeholder="Last Name" />
+                  <ErrorMessage name="last_name" component="div" className="error-message" />
+                </div>
+                <div className="input-group">
+                  <Field type="text" name="date_of_birth" placeholder="Date of Birth" />
+                  <ErrorMessage name="date_of_birth" component="div" className="error-message" />
+                </div>
+                <div className="input-group">
+                  <Field type="text" name="gender" placeholder="Gender" />
+                  <ErrorMessage name="gender" component="div" className="error-message" />
+                </div>
+                <div className="input-group">
+                  <Field type="text" name="phone_no" placeholder="Phone Number" />
+                  <ErrorMessage name="phone_no" component="div" className="error-message" />
+                </div>
+                {mode === 'add' && (
+                  <>
+                    <div className="input-group">
+                      <Field type="text" name="email" placeholder="Email" />
+                      <ErrorMessage name="email" component="div" className="error-message" />
+                    </div>
+                    <div className="input-group">
+                      <Field type="password" name="password" placeholder="Password" />
+                      <ErrorMessage name="password" component="div" className="error-message" />
+                    </div>
+                  </>
+                )}
+                <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                  Submit
+                </button>
               </div>
-              <div className="input-group">
-                <Field type="text" name="last_name" placeholder="Last Name" />
-                <ErrorMessage name="last_name" component="div" className="error-message" />
-              </div>
-              <div className="input-group">
-                <Field type="text" name="date_of_birth" placeholder="Date of Birth" />
-                <ErrorMessage name="date_of_birth" component="div" className="error-message" />
-              </div>
-              <div className="input-group">
-                <Field type="text" name="gender" placeholder="Gender" />
-                <ErrorMessage name="gender" component="div" className="error-message" />
-              </div>
-              <div className="input-group">
-                <Field type="text" name="phone_no" placeholder="Phone Number" />
-                <ErrorMessage name="phone_no" component="div" className="error-message" />
-              </div>
-              {mode === 'add' && (
-                <>
-                  <div className="input-group">
-                    <Field type="text" name="email" placeholder="Email" />
-                    <ErrorMessage name="email" component="div" className="error-message" />
-                  </div>
-                  <div className="input-group">
-                    <Field type="password" name="password" placeholder="Password" />
-                    <ErrorMessage name="password" component="div" className="error-message" />
-                  </div>
-                </>
-              )}
-              <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-                Submit
-              </button>
             </Form>
           )}
         </Formik>

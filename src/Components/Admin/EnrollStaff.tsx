@@ -30,7 +30,7 @@ interface ApiResponseForUsers {
       updated_at: string;
       jti: string;
     };
-    errors:[]
+    errors: []
   };
 }
 
@@ -96,8 +96,8 @@ const EnrollStaff: React.FC<EnrollStaffProps> = ({ onClose, onSuccess, mode, row
         body: JSON.stringify(requestBody),
       });
       const dataForUsers: ApiResponseForUsers = await responseForUser.json();
-      if(dataForUsers.status.errors && dataForUsers.status.errors.length>0){
-        dataForUsers.status.errors.forEach((ele:string)=>{
+      if (dataForUsers.status.errors && dataForUsers.status.errors.length > 0) {
+        dataForUsers.status.errors.forEach((ele: string) => {
           toast.success(ele)
         })
       }
@@ -164,7 +164,7 @@ const EnrollStaff: React.FC<EnrollStaffProps> = ({ onClose, onSuccess, mode, row
 
   return (
 
-    <div className="modal" style={{display:'block'}}>
+    <div className="modal" style={{ display: 'block' }}>
       <div className="modal-content">
         <div className='row'>
           <div className='col-2'>
@@ -176,7 +176,112 @@ const EnrollStaff: React.FC<EnrollStaffProps> = ({ onClose, onSuccess, mode, row
             <span className="close" onClick={onClose}>&times;</span>
           </div>
         </div>
-        <form onSubmit={handleSubmit}>
+        <div className="form-container">
+          <form onSubmit={handleSubmit}>
+            <div className="input-group">
+              <label htmlFor="first_name">First Name</label>
+              <input
+                type="text"
+                name="first_name"
+                value={formData.first_name}
+                onChange={handleChange}
+                placeholder="First Name"
+                required
+              />
+            </div>
+            <div className="input-group">
+              <label htmlFor="last_name">Last Name</label>
+              <input
+                type="text"
+                name="last_name"
+                value={formData.last_name}
+                onChange={handleChange}
+                placeholder="Last Name"
+                required
+              />
+            </div>
+            <div className="input-group">
+              <label htmlFor="date_of_birth">Date of Birth</label>
+              <input
+                type="date"
+                name="date_of_birth"
+                value={formData.date_of_birth}
+                onChange={handleChange}
+                placeholder="Date of Birth"
+                required
+              />
+            </div>
+            <div className="input-group">
+              <label>Gender</label>
+              <div>
+                <label>
+                  <input
+                    type="radio"
+                    name="gender"
+                    value="male"
+                    checked={formData.gender === "male"}
+                    onChange={handleChange}
+                    required
+                  />
+                  Male
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="gender"
+                    value="female"
+                    checked={formData.gender === "female"}
+                    onChange={handleChange}
+                    required
+                  />
+                  Female
+                </label>
+              </div>
+            </div>
+            <div className="input-group">
+              <label htmlFor="phone_no">Phone Number</label>
+              <input
+                type="tel"
+                name="phone_no"
+                value={formData.phone_no}
+                onChange={handleChange}
+                placeholder="Phone Number"
+                pattern="[0-9]{3}[0-9]{3}[0-9]{4}"
+                required
+              />
+              <small>Format: XXXXXXXXXX</small>
+            </div>
+            {mode === 'add' && (
+              <>
+                <div className="input-group">
+                  <label htmlFor="email">Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="Email"
+                    required
+                  />
+                </div>
+                <div className="input-group">
+                  <label htmlFor="password">Password</label>
+                  <input
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="Password"
+                    required
+                  />
+                </div>
+              </>
+            )}
+            <button type="submit" className="btn btn-primary">Submit</button>
+          </form>
+        </div>
+
+        {/* <form onSubmit={handleSubmit}>
           <div className="input-group">
             <input type="text" name="first_name" value={formData.first_name} onChange={handleChange} placeholder="First Name" />
           </div>
@@ -215,7 +320,7 @@ const EnrollStaff: React.FC<EnrollStaffProps> = ({ onClose, onSuccess, mode, row
             </>
           )}
           <button type="submit" className="btn btn-primary">Submit</button>
-        </form>
+        </form> */}
       </div>
       <ToastContainer position="top-right"
         autoClose={5000}
