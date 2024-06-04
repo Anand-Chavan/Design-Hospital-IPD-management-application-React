@@ -5,6 +5,7 @@ import { StaffDetailsColumn } from "../../Utils/Column";
 import EnrollStaff from "./EnrollStaff";
 import '../../Styles/ListStaff.css'
 import { SelectedRow } from "../../Utils/Constants";
+import { FaSearch } from "react-icons/fa";
 
 
 
@@ -59,10 +60,13 @@ const deleteStaffDetails = async (userId: number) => {
 
 const ListStaff = () => {
   const [staffDetails, setStaffDetails] = useState([]);
+  const [originalStaffDetails, setOriginalStaffDetails] = useState([]);
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [mode, setMode] = useState('add');
   const [selectedRow, setSelectedRow] = useState<SelectedRow | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
 
   useEffect(() => {
@@ -70,6 +74,7 @@ const ListStaff = () => {
       try {
         const resp = await getStaffDetails();
         setStaffDetails(resp.staff);
+        setOriginalStaffDetails(resp.staff);
         setIsLoading(false);
       } catch (error) {
         console.error('Error fetching room details:', error);
@@ -82,6 +87,7 @@ const ListStaff = () => {
   const handleSuccess = (newStaff: any[]) => {
     getStaffDetails().then((resp: any) => {
       setStaffDetails(resp.staff)
+      setOriginalStaffDetails(resp.staff);
       setIsLoading(false);
       toast.success('User Updated successful!');
     })
@@ -101,13 +107,31 @@ const ListStaff = () => {
         deleteStaffDetails(selectedRow?.user_id).then(() => {
           setIsLoading(true);
           getStaffDetails().then((resp: any) => {
-            setStaffDetails(resp.staff)
+            setStaffDetails(resp.staff);
+            setOriginalStaffDetails(resp.staff);
             setIsLoading(false);
           })
         })
       }
     }
   }
+
+  const handleSearchInput = (event: any) => {
+    console.log(event.target.value);
+    setSearchTerm(event.target.value);
+    if (event.target.value != '') {
+      const filteredAndSortedData = originalStaffDetails
+        .filter((item) =>
+          Object.values(item).some((value: any) =>
+            value.toString().toLowerCase().includes(event.target.value.toLowerCase())
+          )
+        )
+      setStaffDetails(filteredAndSortedData);
+    }
+    else {
+      setStaffDetails(originalStaffDetails);
+    }
+  };
 
   return (
     <div>
@@ -117,15 +141,26 @@ const ListStaff = () => {
         ) : (
           <>
             <div className="row m-2">
-              <div className="col-md-4"></div>
+              <div className="col-md-4">
+                {/* <div className="search-bar">
+                  <FaSearch className="search-icon" ></FaSearch>
+                  <input
+                    type="text"
+                    className="search-input"
+                    placeholder="Search..."
+                    value={searchTerm}
+                    onChange={handleSearchInput}
+                  />
+                </div> */}
+              </div>
               <div className="col-md-4">
                 <h2>Staff Details</h2>
               </div>
               <div className="col-md-4">
-                <button style={{ float: 'right',width:'140px' }} onClick={() => { setIsDialogOpen(true); setMode('add'); }}>Add Staff</button>
+                <button style={{ float: 'right', width: '140px' }} onClick={() => { setIsDialogOpen(true); setMode('add'); }}>Add Staff</button>
               </div>
             </div>
-            <div className="row m-2">
+            <div className="row m-4">
               <CommonTable data={staffDetails} columns={StaffDetailsColumn} handleEdit={handleEdit} handleDelete={handleDelete} />
             </div>
           </>

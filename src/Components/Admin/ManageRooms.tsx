@@ -7,6 +7,7 @@ import EnrollRoom from './EnrollRoom';
 import { SelectedRow } from '../../Utils/Constants';
 import '../../Styles/ListStaff.css'
 import { AdminLogin } from '../../Utils/ApiRes';
+import { FaSearch } from 'react-icons/fa';
 
 
 const getRoomDetails = async () => {
@@ -65,29 +66,35 @@ const ManageRooms = () => {
   const [selectedRow, setSelectedRow] = useState<SelectedRow | null>(null);
   const [loginData, setLoginData] = useState<AdminLogin | null>(null);
 
+  const [roomOriginlDetails, setOriginalRoomDetails] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+
+
   useEffect(() => {
-    if(roomDetails.length == 0){
+    if (roomDetails.length == 0) {
       const fetchRoomDetails = async () => {
         try {
           const resp = await getRoomDetails();
           setRoomDetails(resp.data);
+          setOriginalRoomDetails(resp.data);
           setLoginData(JSON.parse(localStorage.getItem('loginData') as string));
         } catch (error) {
           console.error('Error fetching room details:', error);
-          toast.error('Failed to fetch room details'); // Add a toast for error handling
+          toast.error('Failed to fetch room details');
         } finally {
           setIsLoading(false);
         }
       };
       fetchRoomDetails();
     }
-  }, []); // Empty dependency array for componentDidMount-like behavior
+  }, []);
 
 
 
   const handleSuccess = (newRoom: any[]) => {
     getRoomDetails().then((resp: any) => {
       setRoomDetails(resp.data);
+      setOriginalRoomDetails(resp.data);
       setIsLoading(false);
       toast.success('Room added/updated successfully!');
     })
@@ -107,12 +114,29 @@ const ManageRooms = () => {
           setIsLoading(true);
           getRoomDetails().then((resp: any) => {
             setRoomDetails(resp.rooms);
+            setOriginalRoomDetails(resp.rooms);
             setIsLoading(false);
           })
         })
       }
     }
   }
+
+  const handleSearchInput = (event: any) => {
+    setSearchTerm(event.target.value);
+    if (event.target.value != '') {
+      const filteredAndSortedData = roomOriginlDetails
+        .filter((item) =>
+          Object.values(item).some((value: any) =>
+            value.toString().toLowerCase().includes(event.target.value.toLowerCase())
+          )
+        )
+      setRoomDetails(filteredAndSortedData);
+    }
+    else {
+      setRoomDetails(roomOriginlDetails);
+    }
+  };
 
   return (
     <div>
@@ -122,7 +146,18 @@ const ManageRooms = () => {
         ) : (
           <>
             <div className="row m-2">
-              <div className="col-md-4"></div>
+              <div className="col-md-4">
+                {/* <div className="search-bar">
+                  <FaSearch className="search-icon" ></FaSearch>
+                  <input
+                    type="text"
+                    className="search-input"
+                    placeholder="Search..."
+                    value={searchTerm}
+                    onChange={handleSearchInput}
+                  />
+                </div> */}
+              </div>
               <div className="col-md-4">
                 <h2>Room Details</h2>
               </div>
@@ -130,7 +165,7 @@ const ManageRooms = () => {
                 <button style={{ float: 'right' }} onClick={() => { setIsDialogOpen(true); setMode('add'); }}>Add Room</button>
               </div>
             </div>
-            <div className="row m-2">
+            <div className="row m-4">
               {loginData?.status.role == 'admin' ? (
                 <CommonTable
                   data={roomDetails}

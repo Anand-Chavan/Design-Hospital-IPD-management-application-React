@@ -5,7 +5,7 @@ export interface Column {
 }
 
 export const StaffDetailsColumn:Column[] = [
-    { Header: 'ID', accessor: 'id', dataType: 'string' },
+    { Header: 'ID', accessor: 'index', dataType: 'string' },
     { Header: 'First Name', accessor: 'first_name', dataType: 'string' },
     { Header: 'Last Name', accessor: 'last_name', dataType: 'string' },
     { Header: 'DOB', accessor: 'date_of_birth', dataType: 'string' },
@@ -16,7 +16,7 @@ export const StaffDetailsColumn:Column[] = [
 ];
 
 export const RoomDetailsColumn:Column[] = [
-    { Header: 'ID', accessor: 'id', dataType: 'string' },
+    { Header: 'ID', accessor: 'index', dataType: 'string' },
     { Header: 'Room Type', accessor: 'room_type', dataType: 'string' },
     { Header: 'Description', accessor: 'description', dataType: 'string' },
     { Header: 'Charges', accessor: 'charges', dataType: 'string' },
@@ -26,7 +26,7 @@ export const RoomDetailsColumn:Column[] = [
 ];
 
 export const AdmissionDetailsColumn:Column[] = [
-    { Header: 'ID', accessor: 'id', dataType: 'string' },
+    { Header: 'ID', accessor: 'index', dataType: 'string' },
     { Header: 'Patient', accessor: 'patient', dataType: 'string' },
     { Header: 'Staff', accessor: 'staff', dataType: 'string' },
     { Header: 'Room', accessor: 'room', dataType: 'string' },
@@ -35,7 +35,7 @@ export const AdmissionDetailsColumn:Column[] = [
 ];
 
 export const MedicineDetailsColumn = [
-    { Header: 'ID', accessor: 'id', dataType: 'string' },
+    { Header: 'ID', accessor: 'index', dataType: 'string' },
     { Header: 'Name', accessor: 'name', dataType: 'string' },
     { Header: 'Price', accessor: 'price', dataType: 'string' },
     { Header: 'Created At', accessor: 'created_at', dataType: 'date' },

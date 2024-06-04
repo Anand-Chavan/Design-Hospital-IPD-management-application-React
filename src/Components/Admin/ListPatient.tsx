@@ -5,6 +5,8 @@ import { StaffDetailsColumn } from "../../Utils/Column";
 import EnrollPatient from "./EnrollPatient";
 import '../../Styles/ListStaff.css'
 import { SelectedRow } from "../../Utils/Constants";
+import { FaSearch } from "react-icons/fa";
+
 
 const getPatientDetails = async () => {
     let PatientDetails;
@@ -57,16 +59,19 @@ const deletePatientDetails = async (userId: number) => {
 
 const ListPatient = () => {
     const [PatientDetails, setPatientDetails] = useState([]);
+    const [originalPatientDetails, setOriginalPatientDetails] = useState([]);
+
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [mode, setMode] = useState('add');
     const [selectedRow, setSelectedRow] = useState<SelectedRow | null>(null);
-
+    const [searchTerm, setSearchTerm] = useState('');
 
 
     useEffect(() => {
         getPatientDetails().then((resp: any) => {
-            setPatientDetails(resp.patients)
+            setPatientDetails(resp.patients);
+            setOriginalPatientDetails(resp.patients)
             setIsLoading(false);
         })
     }, [])
@@ -74,6 +79,7 @@ const ListPatient = () => {
     const handleSuccess = (newPatient: any[]) => {
         getPatientDetails().then((resp: any) => {
             setPatientDetails(resp.patients)
+            setOriginalPatientDetails(resp.patients);
             setIsLoading(false);
             toast.success('User Updated successful!');
         })
@@ -94,12 +100,29 @@ const ListPatient = () => {
                     setIsLoading(true);
                     getPatientDetails().then((resp: any) => {
                         setPatientDetails(resp.Patient)
+                        setOriginalPatientDetails(resp.Patient)
                         setIsLoading(false);
                     })
                 })
             }
         }
     }
+
+    const handleSearchInput = (event: any) => {
+        setSearchTerm(event.target.value);
+        if(event.target.value!=''){
+            const filteredAndSortedData = originalPatientDetails
+                .filter((item) =>
+                    Object.values(item).some((value: any) =>
+                        value.toString().toLowerCase().includes(event.target.value.toLowerCase())
+                    )
+                )
+            setPatientDetails(filteredAndSortedData);
+        }
+        else{
+            setPatientDetails(originalPatientDetails);
+        }
+    };
 
     return (
         <div>
@@ -109,15 +132,26 @@ const ListPatient = () => {
                 ) : (
                     <>
                         <div className="row m-2">
-                            <div className="col-md-4"></div>
+                            <div className="col-md-4">
+                                {/* <div className="search-bar">
+                                    <FaSearch className="search-icon" ></FaSearch>
+                                    <input
+                                        type="text"
+                                        className="search-input"
+                                        placeholder="Search..."
+                                        value={searchTerm}
+                                        onChange={handleSearchInput}
+                                    />
+                                </div> */}
+                            </div>
                             <div className="col-md-4">
                                 <h2>Patient Details</h2>
                             </div>
                             <div className="col-md-4">
-                                <button  style={{ float: 'right',width:'140px' }} onClick={() => { setIsDialogOpen(true); setMode('add'); }}>Add Patient</button>
+                                <button style={{ float: 'right', width: '140px', marginTop: '5px ' }} onClick={() => { setIsDialogOpen(true); setMode('add'); }}>Add Patient</button>
                             </div>
                         </div>
-                        <div className="row m-2">
+                        <div className="row m-4">
                             <CommonTable data={PatientDetails} columns={StaffDetailsColumn} handleEdit={handleEdit} handleDelete={handleDelete} />
                         </div>
                     </>

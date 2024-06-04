@@ -1,7 +1,7 @@
 // CommonTable.tsx
-import React, { useMemo, useState } from 'react';
-import { useTable, usePagination } from 'react-table';
-import { FaEdit, FaTrash, FaDownload, FaPlusCircle } from 'react-icons/fa'; // Import Font Awesome icons
+import React, { useEffect, useMemo, useState } from 'react';
+import { useTable, usePagination, useSortBy } from 'react-table';
+import { FaEdit, FaTrash, FaDownload, FaPlusCircle, FaSort, FaSortDown, FaSortUp } from 'react-icons/fa'; // Import Font Awesome icons
 import '../Styles/CommonTable.css';
 import DeleteConfirmation from './DeleteConfirmation';
 import '../Styles/Room.css';
@@ -19,6 +19,17 @@ interface CommonTableProps {
 const CommonTable: React.FC<CommonTableProps> = ({ columns, data, handleEdit, handleDelete, downloadInvoice, showTretment }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState<any>(null); // Specify type for selectedRow
+  const [searchTerm, setSearchTerm] = useState(''); // State for search term
+
+
+  useEffect(() => {
+    if (data && data.length > 0) {
+      data.forEach((ele, index) => {
+        ele['index'] = index;
+      })
+    }
+    console.log(data)
+  }, [])
 
   const downloadInvoiceIn = (rowData: any) => {
     setSelectedRow(rowData);
@@ -73,6 +84,18 @@ const CommonTable: React.FC<CommonTableProps> = ({ columns, data, handleEdit, ha
     return handleEdit || handleDelete ? [...columns, actionsColumn] : columns;
   }, [columns, handleEdit, handleDelete, showTretment]);
 
+
+  const filteredData = useMemo(() => {
+    if (searchTerm) {
+      return data.filter(row => 
+        columns.some(column => 
+          String(row[column.accessor]).toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+    }
+    return data;
+  }, [data, searchTerm, columns]);
+
   const {
     getTableProps,
     getTableBodyProps,
@@ -88,14 +111,22 @@ const CommonTable: React.FC<CommonTableProps> = ({ columns, data, handleEdit, ha
   } = useTable(
     {
       columns: columnsWithActions,
-      data,
+      data:filteredData,
       initialState: { pageIndex: 0 } as any,
     },
+    useSortBy,
     usePagination
   ) as any;
 
   return (
     <div className="common-table">
+      <input
+        type="text"
+        placeholder="Search..."
+        value={searchTerm}
+        onChange={e => setSearchTerm(e.target.value)}
+        className="search-input mb-2"
+      />
       {data.length === 0 ? (
         <p style={{ textAlign: 'center', fontSize: '1.2rem', color: '#777', marginTop: '20px' }}>No data found</p>
       ) : (
@@ -105,32 +136,35 @@ const CommonTable: React.FC<CommonTableProps> = ({ columns, data, handleEdit, ha
               {headerGroups.map((headerGroup: any, indexThead: number) => (
                 <tr key={indexThead} {...headerGroup.getHeaderGroupProps()}>
                   {headerGroup.headers.map((column: any, indexTh: number) => (
-                    <th key={indexTh} {...column.getHeaderProps()}>{column.render('Header')}</th>
+                    <>
+                      <th key={indexTh} {...column.getHeaderProps(column.getSortByToggleProps())}>
+                        {column.render('Header')}
+                        {column.isSorted ? (
+                          column.isSortedDesc ? (
+                            <FaSortDown />
+                          ) : (
+                            <FaSortUp />
+                          )
+                        ) : (
+                          <FaSort />
+                        )}
+                      </th>
+                    </>
                   ))}
                 </tr>
               ))}
             </thead>
             <tbody {...getTableBodyProps()}>
-              {page.map((row: any,Header:number) => {
+              {page.map((row: any, Header: number) => {
                 prepareRow(row);
                 return (
                   <tr key={row.id} {...row.getRowProps()}>
-                    {/* {row.cells.map((cell: any, indexTd: number) => (
-                      <td key={indexTd} {...cell.getCellProps()}>
-                        {cell.column.dataType === 'date' ? (
-                          format(new Date(cell.value), 'MM/dd/yyyy')
-                        ) :(cell.column.accessor === 'id' ?(
-                          {indexTd}
-                        ):(cell.render('Cell')))}
-                      </td>
-                    ))} */}
-
                     {row.cells.map((cell: any, indexTd: number) => (
                       <td key={indexTd} {...cell.getCellProps()}>
                         {cell.column.dataType === 'date' ? (
                           format(new Date(cell.value), 'MM/dd/yyyy')
                         ) : cell.column.Header === 'ID' ? (
-                          Header+1
+                          Number(row.id) + 1
                         ) : (
                           cell.render('Cell')
                         )}

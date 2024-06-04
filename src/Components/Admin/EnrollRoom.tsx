@@ -80,7 +80,7 @@ const EnrollRoom: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, rowDa
         }
     }, []);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: any) => {
         const { name, value } = e.target;
         setFormData(prevData => ({
             ...prevData,
@@ -156,7 +156,7 @@ const EnrollRoom: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, rowDa
     };
 
     return (
-        <div className="modal" style={{display:'block'}}>
+        <div className="modal" style={{ display: 'block' }}>
             <div className="modal-content">
                 <div className='row'>
                     <div className='col-2'></div>
@@ -167,7 +167,65 @@ const EnrollRoom: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, rowDa
                         <span className="close" onClick={onClose}>&times;</span>
                     </div>
                 </div>
-                <form onSubmit={handleSubmit}>
+
+                <div className="form-container">
+                    <form onSubmit={handleSubmit}>
+                        <div className="input-group">
+                            <label htmlFor="room_type">Room Type</label>
+                            <select
+                                name="room_type"
+                                value={formData.room_type}
+                                onChange={handleChange}
+                                required
+                            >
+                                <option value="">Select Room Type</option>
+                                <option value="Single">Single</option>
+                                <option value="Double">Double</option>
+                                <option value="Suite">Suite</option>
+                            </select>
+                        </div>
+                        <div className="input-group">
+                            <label htmlFor="description">Description</label>
+                            <input
+                                type="text"
+                                name="description"
+                                value={formData.description}
+                                onChange={handleChange}
+                                placeholder="Description"
+                                required
+                            />
+                        </div>
+                        <div className="input-group">
+                            <label htmlFor="charges">Charges</label>
+                            <input
+                                type="number"
+                                name="charges"
+                                value={formData.charges}
+                                onChange={handleChange}
+                                placeholder="Charges"
+                                min="0"
+                                step="0.01"
+                                required
+                            />
+                        </div>
+                        <div className="input-group">
+                            <label htmlFor="capacity">Capacity</label>
+                            <input
+                                type="number"
+                                name="capacity"
+                                value={formData.capacity}
+                                onChange={handleChange}
+                                placeholder="Capacity"
+                                min="1"
+                                max="100"
+                                required
+                            />
+                        </div>
+                        <button type="submit" className="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+
+                {/* <form onSubmit={handleSubmit}>
                     <div className="input-group">
                         <input type="text" name="room_type" value={formData.room_type} onChange={handleChange} placeholder="Room Type" />
                     </div>
@@ -181,7 +239,7 @@ const EnrollRoom: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, rowDa
                         <input type="number" name="capacity" value={formData.capacity} onChange={handleChange} placeholder="Capacity" />
                     </div>
                     <button type="submit" className="btn btn-primary">Submit</button>
-                </form>
+                </form> */}
             </div>
             <ToastContainer
                 position="top-right"

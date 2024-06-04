@@ -8,27 +8,123 @@
   background-color: rgb(215, 236, 243);
 }
 
-.cp{
+.cp {
   cursor: pointer;
 }
 
-.flt{
+.flt {
   float: left;
 }
 
-.text-center{
+.text-center {
   text-align: center;
 }
 
-.f12{
+.f12 {
   font-size: 12px;
 }
 
-.f20{
+.f20 {
   font-size: 20px;
 }
 
-.mr-2{
+.mr-2 {
   margin-right: 10px;
 }
 
+
+/* Add this CSS to your styles file or within a <style> tag in your component */
+.search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  color: #aaa;
+  top: 15px;
+  font-size: 16px;
+}
+
+.search-input {
+  width: 30%;
+  padding: 10px 10px 10px 30px;
+  border-radius: 20px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.search-input:focus {
+  border-color: #007bff;
+}
+
+.showOnHover {
+  visibility: hidden;
+}
+
+.showOnHover:hover {
+  visibility: visible;
+}
+
+/* Room CSS */
+
+
+/* Styling for form */
+.form-container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+/* Styling for input groups */
+.input-group {
+  margin-bottom: 15px;
+}
+
+/* Styling for labels */
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+/* Styling for inputs and select */
+input[type="text"],
+input[type="number"],
+select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  /* Ensures padding is included in the width */
+}
+
+/* Styling for submit button */
+.btn-primary {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+/* Optional: Styling for form error messages */
+.error-message {
+  color: red;
+  font-size: 0.8em;
+  margin-top: 5px;
+}
