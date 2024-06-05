@@ -6,8 +6,6 @@ import { RoomDetailsColumn } from '../../Utils/Column';
 import EnrollRoom from './EnrollRoom';
 import { SelectedRow } from '../../Utils/Constants';
 import '../../Styles/ListStaff.css'
-import { AdminLogin } from '../../Utils/ApiRes';
-import { FaSearch } from 'react-icons/fa';
 import { RootState } from '../../Redux/Store';
 import { useSelector } from 'react-redux';
 
@@ -150,16 +148,6 @@ const ManageRooms = () => {
           <>
             <div className="row m-2">
               <div className="col-md-4">
-                {/* <div className="search-bar">
-                  <FaSearch className="search-icon" ></FaSearch>
-                  <input
-                    type="text"
-                    className="search-input"
-                    placeholder="Search..."
-                    value={searchTerm}
-                    onChange={handleSearchInput}
-                  />
-                </div> */}
               </div>
               <div className="col-md-4">
                 <h2>Room Details</h2>

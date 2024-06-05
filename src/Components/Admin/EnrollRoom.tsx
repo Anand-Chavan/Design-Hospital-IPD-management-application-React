@@ -1,111 +1,68 @@
-import React, { useEffect, useState } from 'react';
-import '../../Styles/Modal.css';
+import React, { useEffect } from 'react';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 import { ToastContainer, toast } from 'react-toastify';
-import '../../Styles/Room.css';
-
+import 'react-toastify/dist/ReactToastify.css';
 
 interface EnrollRoomProps {
     onClose: () => void;
     onSuccess: (newRoom: any) => void;
     mode: string;
     rowData?: any;
-    roomData?: {
-        room_type: string;
-        description: string;
-        charges: number;
-        capacity: number;
-    };
 }
 
 interface RoomData {
-    first_name: string;
-    last_name: string;
-    date_of_birth: string;
-    gender: string;
-    phone_no: string;
-    email: string;
-    password: string;
-}
-
-interface ApiResponseForUsers {
-    status: {
-        message: string;
-        data: {
-            id: number;
-            email: string;
-            created_at: string;
-            updated_at: string;
-            jti: string;
-        };
-        errors: [];
-    };
+    room_type: string;
+    description: string;
+    charges: number;
+    capacity: number;
 }
 
 const EnrollRoom: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, rowData }) => {
-    const [formData, setFormData] = useState<RoomData & {
-        room_type: string;
-        description: string;
-        charges: number;
-        capacity: number;
-    }>({
-        first_name: '',
-        last_name: '',
-        date_of_birth: '',
-        gender: '',
-        phone_no: '',
-        email: '',
-        password: '',
+    const initialValues: RoomData = {
         room_type: '',
         description: '',
         charges: 0,
         capacity: 0,
+    };
+
+    const validationSchema = Yup.object({
+        room_type: Yup.string().required('Room type is required'),
+        description: Yup.string().required('Description is required'),
+        charges: Yup.number().required('Charges are required').min(0, 'Charges must be at least 0'),
+        capacity: Yup.number().required('Capacity is required').min(1, 'Capacity must be at least 1').max(100, 'Capacity cannot exceed 100'),
+    });
+
+    const formik = useFormik({
+        initialValues,
+        validationSchema,
+        onSubmit: async (values) => {
+            if (mode === 'add') {
+                await handleAdd(values);
+            } else if (mode === 'edit') {
+                await handleEdit(values);
+            }
+        },
     });
 
     useEffect(() => {
-        if (mode === 'edit') {
-            const editObj = {
-                first_name: rowData?.first_name,
-                last_name: rowData?.last_name,
-                date_of_birth: rowData?.date_of_birth,
-                gender: rowData?.gender,
-                phone_no: rowData?.phone_no,
-                email: '',
-                password: '',
-                room_type: rowData?.room_type || '',
-                description: rowData?.description || '',
-                charges: rowData?.charges || 0,
-                capacity: rowData?.capacity || 0,
-            };
-            setFormData(editObj);
+        if (mode === 'edit' && rowData) {
+            formik.setValues({
+                room_type: rowData.room_type || '',
+                description: rowData.description || '',
+                charges: rowData.charges || 0,
+                capacity: rowData.capacity || 0,
+            });
         }
-    }, []);
+    }, [mode, rowData]);
 
-    const handleChange = (e: any) => {
-        const { name, value } = e.target;
-        setFormData(prevData => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
-
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        if (mode === 'add') handleAdd();
-        if (mode === 'edit') handleEdit();
-    };
-
-    const handleAdd = async () => {
+    const handleAdd = async (values: RoomData) => {
         try {
             const requestBody = {
-                room: {
-                    room_type: formData.room_type,
-                    description: formData.description,
-                    charges: formData.charges,
-                    capacity: formData.capacity,
-                },
+                room: values,
             };
 
-            const responseForUser = await fetch('http://localhost:3000/rooms', {
+            const response = await fetch('http://localhost:3000/rooms', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -113,45 +70,41 @@ const EnrollRoom: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, rowDa
                 },
                 body: JSON.stringify(requestBody),
             });
-            const dataForUsers = await responseForUser.json();
-            if (dataForUsers?.status?.errors && dataForUsers?.status?.errors?.length > 0) {
-                dataForUsers.status.errors.forEach((ele: string) => {
-                    toast.success(ele)
-                })
+            const data = await response.json();
+            if (data?.status?.errors && data?.status?.errors.length > 0) {
+                data.status.errors.forEach((ele: string) => {
+                    toast.error(ele);
+                });
+            } else {
+                onSuccess(data);
+                toast.success('Room added successfully!');
+                onClose();
             }
-            onSuccess(dataForUsers);
-            toast.success('Room Added successful!');
-            onClose();
-
         } catch (error) {
-            console.error('Error adding Room:', error);
+            console.error('Error adding room:', error);
         }
     };
 
-    const handleEdit = async () => {
+    const handleEdit = async (values: RoomData) => {
         try {
             const requestBody = {
-                room: {
-                    room_type: formData.room_type,
-                    description: formData.description,
-                    charges: formData.charges,
-                    capacity: formData.capacity,
-                },
+                room: values,
             };
-            const responseForUserDetails = await fetch(`http://localhost:3000/rooms/${rowData.id}`, {
+
+            const response = await fetch(`http://localhost:3000/rooms/${rowData.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': localStorage.getItem('token') as string
                 },
-
                 body: JSON.stringify(requestBody),
             });
-            onSuccess(responseForUserDetails);
-            toast.success('User Updated successful!');
+            const data = await response.json();
+            onSuccess(data);
+            toast.success('Room updated successfully!');
             onClose();
         } catch (error) {
-            console.error('Error updating Room:', error);
+            console.error('Error updating room:', error);
         }
     };
 
@@ -169,13 +122,12 @@ const EnrollRoom: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, rowDa
                 </div>
 
                 <div className="form-container">
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={formik.handleSubmit}>
                         <div className="input-group">
                             <label htmlFor="room_type">Room Type</label>
                             <select
-                                name="room_type"
-                                value={formData.room_type}
-                                onChange={handleChange}
+                                id="room_type"
+                                {...formik.getFieldProps('room_type')}
                                 required
                             >
                                 <option value="">Select Room Type</option>
@@ -183,63 +135,56 @@ const EnrollRoom: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, rowDa
                                 <option value="Double">Double</option>
                                 <option value="Suite">Suite</option>
                             </select>
+                            {formik.touched.room_type && formik.errors.room_type ? (
+                                <label className="error-message">{formik.errors.room_type}</label>
+                            ) : null}
                         </div>
                         <div className="input-group">
                             <label htmlFor="description">Description</label>
                             <input
+                                id="description"
                                 type="text"
-                                name="description"
-                                value={formData.description}
-                                onChange={handleChange}
+                                {...formik.getFieldProps('description')}
                                 placeholder="Description"
                                 required
                             />
+                            {formik.touched.description && formik.errors.description ? (
+                                <label className="error-message">{formik.errors.description}</label>
+                            ) : null}
                         </div>
                         <div className="input-group">
                             <label htmlFor="charges">Charges</label>
                             <input
+                                id="charges"
                                 type="number"
-                                name="charges"
-                                value={formData.charges}
-                                onChange={handleChange}
+                                {...formik.getFieldProps('charges')}
                                 placeholder="Charges"
                                 min="0"
                                 step="0.01"
                                 required
                             />
+                            {formik.touched.charges && formik.errors.charges ? (
+                                <label className="error-message">{formik.errors.charges}</label>
+                            ) : null}
                         </div>
                         <div className="input-group">
                             <label htmlFor="capacity">Capacity</label>
                             <input
+                                id="capacity"
                                 type="number"
-                                name="capacity"
-                                value={formData.capacity}
-                                onChange={handleChange}
+                                {...formik.getFieldProps('capacity')}
                                 placeholder="Capacity"
                                 min="1"
                                 max="100"
                                 required
                             />
+                            {formik.touched.capacity && formik.errors.capacity ? (
+                                <label className="error-message">{formik.errors.capacity}</label>
+                            ) : null}
                         </div>
-                        <button type="submit" className="btn btn-primary">Submit</button>
+                        <button type="submit" disabled={!formik.isValid} className="btn btn-primary">Submit</button>
                     </form>
                 </div>
-
-                {/* <form onSubmit={handleSubmit}>
-                    <div className="input-group">
-                        <input type="text" name="room_type" value={formData.room_type} onChange={handleChange} placeholder="Room Type" />
-                    </div>
-                    <div className="input-group">
-                        <input type="text" name="description" value={formData.description} onChange={handleChange} placeholder="Description" />
-                    </div>
-                    <div className="input-group">
-                        <input type="number" name="charges" value={formData.charges} onChange={handleChange} placeholder="Charges" />
-                    </div>
-                    <div className="input-group">
-                        <input type="number" name="capacity" value={formData.capacity} onChange={handleChange} placeholder="Capacity" />
-                    </div>
-                    <button type="submit" className="btn btn-primary">Submit</button>
-                </form> */}
             </div>
             <ToastContainer
                 position="top-right"
@@ -253,7 +198,7 @@ const EnrollRoom: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, rowDa
                 draggable
                 pauseOnHover
                 theme="light"
-            ></ToastContainer>
+            />
         </div>
     );
 };
