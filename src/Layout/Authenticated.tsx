@@ -9,14 +9,19 @@ import { UserDetails } from "../Utils/interface";
 import { AdminMenu, StaffMenu, PatientMenu } from '../Utils/Constants';
 import Footer from "../Components/Common/Footer";
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { useSelector } from "react-redux";
+import { RootState } from "../Redux/Store";
+
+interface AuthenticatedProps {
+    loadInUserData: UserDetails;
+  }
 
 
-const Authenticated = () => {
-    const [loginData, setLoginData] = useState<AdminLogin | null>(null);
-    const [loadInUserData, setLoggedInUsedData] = useState<UserDetails | null>(null);
+const Authenticated = ({ loadInUserData }: AuthenticatedProps) => {
     const [content, setContent] = useState<string>('');
-    const [selectedMenuItem,setSelectedMenuItem] = useState<MenuItem>();
-
+    const loginData:any = useSelector((state: RootState) => {
+        return state.auth.user?.loginData
+    });
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -24,29 +29,16 @@ const Authenticated = () => {
         setContent('')
     };
 
-    useEffect(() => {
-        if (loginData == null) {
-            let data = localStorage.getItem('loginData') as string;
-            setLoginData(JSON.parse(data));
-        }
-    }, []);
-
-
-    const setLoggedInUserDataIn = async () => {
-        if (loginData?.status.data.id)
-            setLoggedInUsedData(await getUserDetailsById(loginData?.status.data.id))
-    }
 
     useEffect(() => {
         if (content == '' && loginData) {
-            if (loginData?.status.role === 'admin') {
+            if (loginData?.role === 'admin') {
                 setContent(AdminMenu[0].component);
-            } else if (loginData?.status.role === 'staff') {
+            } else if (loginData?.role === 'staff') {
                 setContent(StaffMenu[0].component);
             } else {
                 // Handle other roles or no role scenario
             }
-            setLoggedInUserDataIn();
         }
     }, [loginData]);
 
@@ -73,7 +65,6 @@ const Authenticated = () => {
     };
 
     const handleRouteFromApp = (item: MenuItem) => {
-        setSelectedMenuItem(item);
         if (item.component != content && loginData){
             setContent(item.component)
         }
@@ -83,7 +74,7 @@ const Authenticated = () => {
         <Header loginData={loginData} loadInUserData={loadInUserData} handleLogout={handleLogout} />
         <div style={{ flex: '1 0 80%', display: 'flex', flexDirection: 'row' }}>
             <div style={{ flex: '0 0 15%', backgroundColor: '#f9f9f9', color: '#0d0d0d' }}>
-                <Sidebar loginData={loginData} handleRouteFromApp={handleRouteFromApp} />
+                <Sidebar handleRouteFromApp={handleRouteFromApp} />
             </div>
             <div style={{ flex: '1 0 75%', display: 'flex', flexDirection: 'column' }}>
                 {renderComponent(content)}

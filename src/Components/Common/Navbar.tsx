@@ -8,7 +8,7 @@ import { logout } from '../../Redux/Slices/AuthSlice';
 
 interface ComponentBProps {
     handleLogout: () => void;
-    loginData: AdminLogin | null;
+    loginData: any | null;
     loadInUserData:UserDetails | null
 }
 
@@ -23,7 +23,7 @@ const Header: React.FC<ComponentBProps> = ({ handleLogout, loginData,loadInUserD
             <Container style={{ maxWidth: '100%' }}>
                 <Navbar.Brand href="#home" style={{ marginRight: 'auto', color: 'white' }}>Josh Hospital Managment System</Navbar.Brand>
                 <div className="d-flex align-items-center f20" style={{ textTransform: 'capitalize' }}>
-                    <div className="mr-2" >{ loadInUserData?.first_name+' '+loadInUserData?.last_name+' ('+loginData?.status.role+')'}</div>
+                    <div className="mr-2" >{ loadInUserData?.first_name+' '+loadInUserData?.last_name+' ('+loginData?.role+')'}</div>
                     <BiLogOut onClick={handleLogoutButon} className="logout-icon cp ml-5" />
                 </div>
             </Container>

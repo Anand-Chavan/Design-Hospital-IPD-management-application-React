@@ -6,12 +6,16 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { loginSuccess, loginFailure } from '../Redux/Slices/AuthSlice';
+import { loginSuccess } from '../Redux/Slices/AuthSlice';
 import { RootState } from '../Redux/Store';
+import { useLoginUserMutation,useGetUserDetailsQuery } from '../Services/authService';
+import { getUserDetailsById } from '../Utils/GetUserDetailsById';
 
-const Login = ({ onLogin }: any) => {
+
+const Login = ({onLogin}:any) => {
     const dispatch = useDispatch();
     const error = useSelector((state: RootState) => state.auth.error);
+    const [loginUser, { isLoading }] = useLoginUserMutation();
 
     const formik = useFormik({
         initialValues: {
@@ -23,36 +27,17 @@ const Login = ({ onLogin }: any) => {
             password: Yup.string().required('Password is required'),
         }),
         onSubmit: async (values) => {
-            const requestBody = {
-                user: {
+            try {
+                const response = await loginUser({
                     email: values.username,
                     password: values.password,
-                },
-            };
+                }).unwrap();
+                dispatch(loginSuccess({ token: response?.token,loginData:response.status }));
 
-            try {
-                const response = await fetch('http://localhost:3000/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(requestBody),
-                });
+                const userId = response.status.data.id;
+                onLogin(await getUserDetailsById(userId))
 
-                if (response.ok) {
-                    const data = await response.json();
-                    const authorizationHeader = response.headers.get('Authorization');
-                    if (authorizationHeader) {
-                        dispatch(loginSuccess({ token: localStorage.getItem('token') as string }));
-                        onLogin(authorizationHeader, data);
-                        toast.success('Login successful!');
-                    } else {
-                        console.error('Authorization header not found in response');
-                        toast.error('Something went wrong');
-                    }
-                } else {
-                    toast.error('Something went wrong');
-                }
+                toast.success('Login successful!');
             } catch (error) {
                 console.error('Error during login:', error);
                 toast.error('Something went wrong');
@@ -95,7 +80,7 @@ const Login = ({ onLogin }: any) => {
                         <p className="error-message">{formik.errors.password}</p>
                     )}
                 </div>
-                <button type="submit">Login</button>
+                <button type="submit" disabled={isLoading}>Login</button>
             </form>
             <ToastContainer
                 position="top-right"

@@ -1,21 +1,23 @@
 // src/features/auth/authSlice.ts
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { getUserDetailsById } from '../../Utils/GetUserDetailsById';
+import { AdminLogin, LoginResponse, Status } from '../../Utils/ApiRes';
 
 interface AuthState {
     isAuthenticated: boolean;
-    user: { token: string } | null;
+    user: { token: string , loginData?:LoginResponse} | null;
     error: string | null;
-
 }
 
 const initialState: AuthState = {
     isAuthenticated: localStorage.getItem('token') as string ? true : false,
-    user: localStorage.getItem('token') as string ? { token: (localStorage.getItem('token') as string) } : null,
+    user: localStorage.getItem('token') as string ? { 
+            token: (localStorage.getItem('token') as string),
+            loginData : JSON.parse((localStorage.getItem('loginData') as string))
+        } : null,
     error: null,
 };
 
-// Define async thunk for fetching user details
 export const fetchUserDetailsById = createAsyncThunk(
     'auth/fetchUserDetailsById',
     async (id: number, { rejectWithValue }) => {
@@ -32,11 +34,12 @@ const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
-        loginSuccess(state, action: PayloadAction<{ token: string }>) {
+        loginSuccess(state, action: PayloadAction<{ token: string,loginData:LoginResponse }>) {
             state.isAuthenticated = true;
             state.user = action.payload;
             state.error = null;
-            localStorage.setItem('token', JSON.stringify(action.payload));
+            localStorage.setItem('token', (action.payload.token));
+            localStorage.setItem('loginData', JSON.stringify(action.payload.loginData));
         },
         loginFailure(state, action: PayloadAction<string>) {
             state.isAuthenticated = false;

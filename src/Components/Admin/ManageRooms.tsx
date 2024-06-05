@@ -8,6 +8,8 @@ import { SelectedRow } from '../../Utils/Constants';
 import '../../Styles/ListStaff.css'
 import { AdminLogin } from '../../Utils/ApiRes';
 import { FaSearch } from 'react-icons/fa';
+import { RootState } from '../../Redux/Store';
+import { useSelector } from 'react-redux';
 
 
 const getRoomDetails = async () => {
@@ -64,10 +66,12 @@ const ManageRooms = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [mode, setMode] = useState('add');
   const [selectedRow, setSelectedRow] = useState<SelectedRow | null>(null);
-  const [loginData, setLoginData] = useState<AdminLogin | null>(null);
 
   const [roomOriginlDetails, setOriginalRoomDetails] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const loginData: any = useSelector((state: RootState) => {
+    return state.auth.user?.loginData
+  });
 
 
   useEffect(() => {
@@ -77,7 +81,6 @@ const ManageRooms = () => {
           const resp = await getRoomDetails();
           setRoomDetails(resp.data);
           setOriginalRoomDetails(resp.data);
-          setLoginData(JSON.parse(localStorage.getItem('loginData') as string));
         } catch (error) {
           console.error('Error fetching room details:', error);
           toast.error('Failed to fetch room details');
@@ -166,7 +169,7 @@ const ManageRooms = () => {
               </div>
             </div>
             <div className="row m-4">
-              {loginData?.status.role == 'admin' ? (
+              {loginData?.role == 'admin' ? (
                 <CommonTable
                   data={roomDetails}
                   columns={RoomDetailsColumn}

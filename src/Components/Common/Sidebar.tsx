@@ -2,28 +2,34 @@ import { useEffect, useState } from 'react';
 import '../../Styles/sideBar.css';
 import { AdminMenu, MenuItem,PatientMenu,StaffMenu } from '../../Utils/Constants';
 import { AdminLogin } from '../../Utils/ApiRes';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../Redux/Store';
 
 interface ComponentBProps {
     handleRouteFromApp: (item: MenuItem) => void;
-    loginData: AdminLogin | null;
 }
 
-const Sidebar: React.FC<ComponentBProps> = ({ handleRouteFromApp, loginData }) => {
+const Sidebar: React.FC<ComponentBProps> = ({ handleRouteFromApp }) => {
     const [selectedItem, setSelectedItem] = useState(AdminMenu[0]);
     const [renderMenu, setRenderedMenu] = useState(AdminMenu);
+    const loginData:any = useSelector((state: RootState) => {
+        return state.auth.user?.loginData
+    });
 
     useEffect(() => {
-        loginData = JSON.parse(localStorage.getItem('loginData') as string);
-        if (loginData?.status.role === 'admin') {
-          setSelectedItem(AdminMenu[0]);
-          setRenderedMenu(AdminMenu);
-        } else if (loginData?.status.role === 'staff') {
-          setSelectedItem(StaffMenu[0]);
-          setRenderedMenu(StaffMenu);
-        } else {
-          setSelectedItem(PatientMenu[0]);
-          setRenderedMenu(PatientMenu);
-          // Handle other roles or no role scenario if needed
+        console.log(loginData);
+        if(loginData != undefined){
+            if (loginData?.role === 'admin') {
+                setSelectedItem(AdminMenu[0]);
+                setRenderedMenu(AdminMenu);
+            } else if (loginData?.role === 'staff') {
+                setSelectedItem(StaffMenu[0]);
+                setRenderedMenu(StaffMenu);
+            } else {
+                setSelectedItem(PatientMenu[0]);
+                setRenderedMenu(PatientMenu);
+                // Handle other roles or no role scenario if needed
+            }
         }
     }, []);
       
