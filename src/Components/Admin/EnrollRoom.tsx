@@ -3,20 +3,8 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { EnrollRoomProps, RoomData } from '../../Utils/interface';
 
-interface EnrollRoomProps {
-    onClose: () => void;
-    onSuccess: (newRoom: any) => void;
-    mode: string;
-    rowData?: any;
-}
-
-interface RoomData {
-    room_type: string;
-    description: string;
-    charges: number;
-    capacity: number;
-}
 
 const EnrollRoom: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, rowData }) => {
     const initialValues: RoomData = {
@@ -29,14 +17,15 @@ const EnrollRoom: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, rowDa
     const validationSchema = Yup.object({
         room_type: Yup.string().required('Room type is required'),
         description: Yup.string().required('Description is required'),
-        charges: Yup.number().required('Charges are required').min(0, 'Charges must be at least 0'),
+        charges: Yup.number().required('Charges are required').min(100, 'Charges must be at least 100'),
         capacity: Yup.number().required('Capacity is required').min(1, 'Capacity must be at least 1').max(100, 'Capacity cannot exceed 100'),
     });
 
     const formik = useFormik({
         initialValues,
         validationSchema,
-        onSubmit: async (values) => {
+        onSubmit: async (values, { setSubmitting }) => {
+            setSubmitting(true)
             if (mode === 'add') {
                 await handleAdd(values);
             } else if (mode === 'edit') {
@@ -159,7 +148,7 @@ const EnrollRoom: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, rowDa
                                 type="number"
                                 {...formik.getFieldProps('charges')}
                                 placeholder="Charges"
-                                min="0"
+                                min="100"
                                 step="0.01"
                                 required
                             />
@@ -182,7 +171,7 @@ const EnrollRoom: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, rowDa
                                 <label className="error-message">{formik.errors.capacity}</label>
                             ) : null}
                         </div>
-                        <button type="submit" disabled={!formik.isValid} className="btn btn-primary">Submit</button>
+                        <button type="submit" disabled={!formik.isValid || !formik.dirty || formik.isSubmitting} className="btn btn-primary">Submit</button>
                     </form>
                 </div>
             </div>

@@ -6,20 +6,22 @@ import '../Styles/CommonTable.css';
 import DeleteConfirmation from './DeleteConfirmation';
 import '../Styles/Room.css';
 import { format } from 'date-fns';
+import { SelectedRow } from '../Utils/Constants';
+import { Column } from '../Utils/Column';
 
 interface CommonTableProps {
-  columns: any[];
+  columns: Column[];
   data: any[];
   handleEdit?: (rowData: any) => void; // Make handleEdit optional
   handleDelete?: (rowData: any) => void; // Make handleDelete optional
   downloadInvoice?: (rowData: any) => void; // Make download optional
-  showTretment?: (rowData: any) => void;
+  showTretment?: (rowData: any) => void; // For Treatment Section
 }
 
 const CommonTable: React.FC<CommonTableProps> = ({ columns, data, handleEdit, handleDelete, downloadInvoice, showTretment }) => {
-  const [showModal, setShowModal] = useState(false);
-  const [selectedRow, setSelectedRow] = useState<any>(null); // Specify type for selectedRow
-  const [searchTerm, setSearchTerm] = useState(''); // State for search term
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [selectedRow, setSelectedRow] = useState<SelectedRow | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
 
   useEffect(() => {
@@ -28,7 +30,6 @@ const CommonTable: React.FC<CommonTableProps> = ({ columns, data, handleEdit, ha
         ele['index'] = index;
       })
     }
-    console.log(data)
   }, [])
 
   const downloadInvoiceIn = (rowData: any) => {
@@ -45,7 +46,7 @@ const CommonTable: React.FC<CommonTableProps> = ({ columns, data, handleEdit, ha
     }
   };
 
-  const openDialogForDelete = (rowData: any) => {
+  const openDialogForDelete = (rowData: SelectedRow) => {
     setShowModal(true);
     setSelectedRow(rowData);
   };
@@ -87,8 +88,8 @@ const CommonTable: React.FC<CommonTableProps> = ({ columns, data, handleEdit, ha
 
   const filteredData = useMemo(() => {
     if (searchTerm) {
-      return data.filter(row => 
-        columns.some(column => 
+      return data.filter(row =>
+        columns.some(column =>
           String(row[column.accessor]).toLowerCase().includes(searchTerm.toLowerCase())
         )
       );
@@ -111,12 +112,14 @@ const CommonTable: React.FC<CommonTableProps> = ({ columns, data, handleEdit, ha
   } = useTable(
     {
       columns: columnsWithActions,
-      data:filteredData,
+      data: filteredData,
       initialState: { pageIndex: 0 } as any,
     },
     useSortBy,
     usePagination
   ) as any;
+
+  console.log(headerGroups)
 
   return (
     <div className="common-table">
@@ -139,7 +142,7 @@ const CommonTable: React.FC<CommonTableProps> = ({ columns, data, handleEdit, ha
                     <>
                       <th key={indexTh} {...column.getHeaderProps(column.getSortByToggleProps())}>
                         {column.render('Header')}
-                        {column.isSorted ? (
+                        {(column.render('Header')!="Actions") ? (column.isSorted ? (
                           column.isSortedDesc ? (
                             <FaSortDown />
                           ) : (
@@ -147,7 +150,7 @@ const CommonTable: React.FC<CommonTableProps> = ({ columns, data, handleEdit, ha
                           )
                         ) : (
                           <FaSort />
-                        )}
+                        )):(<></>)}
                       </th>
                     </>
                   ))}
@@ -155,14 +158,14 @@ const CommonTable: React.FC<CommonTableProps> = ({ columns, data, handleEdit, ha
               ))}
             </thead>
             <tbody {...getTableBodyProps()}>
-              {page.map((row: any, Header: number) => {
+              {page.map((row: any) => {
                 prepareRow(row);
                 return (
                   <tr key={row.id} {...row.getRowProps()}>
                     {row.cells.map((cell: any, indexTd: number) => (
                       <td key={indexTd} {...cell.getCellProps()}>
                         {cell.column.dataType === 'date' ? (
-                          format(new Date(cell.value), 'MM/dd/yyyy')
+                          format(new Date(cell.value), 'dd/MM/yyyy hh:mm:ss')
                         ) : cell.column.Header === 'ID' ? (
                           Number(row.id) + 1
                         ) : (

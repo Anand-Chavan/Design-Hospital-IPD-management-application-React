@@ -92,7 +92,7 @@ const ManageRooms = () => {
 
 
 
-  const handleSuccess = (newRoom: any[]) => {
+  const handleSuccess = () => {
     getRoomDetails().then((resp: any) => {
       setRoomDetails(resp.data);
       setOriginalRoomDetails(resp.data);

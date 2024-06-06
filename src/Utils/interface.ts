@@ -1,3 +1,5 @@
+import { Room } from "./Schema";
+
 export interface AdmissionData {
     status: string;
     data: AdmissionDetail[];
@@ -66,6 +68,21 @@ export interface UserDetails {
     updated_at: string;
     role_id: number;
     user_id: number;
+}
+
+
+export interface EnrollRoomProps {
+    onClose: () => void;
+    onSuccess: (newRoom: Room) => void;
+    mode: string;
+    rowData?: any;
+}
+
+export interface RoomData {
+    room_type: string;
+    description: string;
+    charges: number;
+    capacity: number;
 }
 
 

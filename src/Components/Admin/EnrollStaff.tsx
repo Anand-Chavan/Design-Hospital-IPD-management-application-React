@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import '../../Styles/Modal.css';
 import '../../Styles/Room.css';
 import { ToastContainer, toast } from 'react-toastify';
+import * as Yup from 'yup';
+import { useFormik } from 'formik';
+
 
 interface EnrollStaffProps {
   onClose: () => void;
@@ -45,6 +48,39 @@ const EnrollStaff: React.FC<EnrollStaffProps> = ({ onClose, onSuccess, mode, row
     email: '',
     password: ''
   });
+
+  const initialValues: StaffData = {
+    first_name: '',
+    last_name: '',
+    date_of_birth: '',
+    gender: '',
+    phone_no: '',
+    email: '',
+    password: ''
+  };
+
+  const validationSchema = Yup.object().shape({
+    first_name: Yup.string().required('First name is required'),
+    last_name: Yup.string().required('Last name is required'),
+    date_of_birth: Yup.date().required('Date of birth is required'),
+    gender: Yup.string().required('Gender is required'),
+    phone_no: Yup.string().matches(/^\d{10}$/, 'Phone number must be 10 digits').required('Phone number is required'),
+    email: Yup.string().email('Invalid email address').required('Email is required'),
+    password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
+  });
+
+  const formik = useFormik({
+    initialValues,
+    validationSchema,
+    onSubmit: async () => {
+      if (mode == 'add')
+        handleAdd();
+      if (mode == 'edit')
+        handleEdit();
+    },
+  });
+
+
 
   useEffect(() => {
     if (mode == 'edit') {
@@ -177,39 +213,43 @@ const EnrollStaff: React.FC<EnrollStaffProps> = ({ onClose, onSuccess, mode, row
           </div>
         </div>
         <div className="form-container">
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={formik.handleSubmit}>
             <div className="input-group">
               <label htmlFor="first_name">First Name</label>
               <input
+                id='first_name'
                 type="text"
-                name="first_name"
-                value={formData.first_name}
-                onChange={handleChange}
+                {...formik.getFieldProps('first_name')}
                 placeholder="First Name"
                 required
               />
+              {formik.touched.first_name && formik.errors.first_name ? (
+                <label className="error-message">{formik.errors.first_name}</label>
+              ) : null}
             </div>
             <div className="input-group">
               <label htmlFor="last_name">Last Name</label>
               <input
                 type="text"
-                name="last_name"
-                value={formData.last_name}
-                onChange={handleChange}
+                {...formik.getFieldProps('last_name')}
                 placeholder="Last Name"
                 required
               />
+              {formik.touched.last_name && formik.errors.last_name ? (
+                <label className="error-message">{formik.errors.last_name}</label>
+              ) : null}
             </div>
             <div className="input-group">
               <label htmlFor="date_of_birth">Date of Birth</label>
               <input
                 type="date"
-                name="date_of_birth"
-                value={formData.date_of_birth}
-                onChange={handleChange}
+                {...formik.getFieldProps('date_of_birth')}
                 placeholder="Date of Birth"
                 required
               />
+              {formik.touched.date_of_birth && formik.errors.date_of_birth ? (
+                <label className="error-message">{formik.errors.date_of_birth}</label>
+              ) : null}
             </div>
             <div className="input-group">
               <label>Gender</label>
@@ -237,19 +277,23 @@ const EnrollStaff: React.FC<EnrollStaffProps> = ({ onClose, onSuccess, mode, row
                   Female
                 </label>
               </div>
+              {formik.touched.gender && formik.errors.gender ? (
+                <label className="error-message">{formik.errors.date_of_birth}</label>
+              ) : null}
             </div>
             <div className="input-group">
               <label htmlFor="phone_no">Phone Number</label>
               <input
                 type="tel"
-                name="phone_no"
-                value={formData.phone_no}
-                onChange={handleChange}
+                {...formik.getFieldProps('phone_no')}
                 placeholder="Phone Number"
                 pattern="[0-9]{3}[0-9]{3}[0-9]{4}"
                 required
               />
-              <small>Format: XXXXXXXXXX</small>
+              {/* <small>Format: XXXXXXXXXX</small> */}
+              {formik.touched.phone_no && formik.errors.phone_no ? (
+                <label className="error-message">{formik.errors.phone_no}</label>
+              ) : null}
             </div>
             {mode === 'add' && (
               <>
@@ -257,27 +301,29 @@ const EnrollStaff: React.FC<EnrollStaffProps> = ({ onClose, onSuccess, mode, row
                   <label htmlFor="email">Email</label>
                   <input
                     type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
+                    {...formik.getFieldProps('email')}
                     placeholder="Email"
                     required
                   />
+                  {formik.touched.email && formik.errors.email ? (
+                    <label className="error-message">{formik.errors.email}</label>
+                  ) : null}
                 </div>
                 <div className="input-group">
                   <label htmlFor="password">Password</label>
                   <input
                     type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
+                    {...formik.getFieldProps('password')}
                     placeholder="Password"
                     required
                   />
+                  {formik.touched.password && formik.errors.password ? (
+                    <label className="error-message">{formik.errors.password}</label>
+                  ) : null}
                 </div>
               </>
             )}
-            <button type="submit" className="btn btn-primary">Submit</button>
+            <button type="submit" disabled={!formik.isValid} className="btn btn-primary">Submit</button>
           </form>
         </div>
 
