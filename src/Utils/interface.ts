@@ -73,7 +73,7 @@ export interface UserDetails {
 
 export interface EnrollRoomProps {
     onClose: () => void;
-    onSuccess: (newRoom: Room) => void;
+    onSuccess: () => void;
     mode: string;
     rowData?: any;
 }

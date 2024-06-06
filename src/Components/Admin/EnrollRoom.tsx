@@ -4,6 +4,7 @@ import * as Yup from 'yup';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { EnrollRoomProps, RoomData } from '../../Utils/interface';
+import { useAddRoomMutation, useUpdateRoomMutation } from '../../Redux/Slices/RoomApiSlices';
 
 
 const EnrollRoom: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, rowData }) => {
@@ -21,16 +22,23 @@ const EnrollRoom: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, rowDa
         capacity: Yup.number().required('Capacity is required').min(1, 'Capacity must be at least 1').max(100, 'Capacity cannot exceed 100'),
     });
 
+    const [addRoom] = useAddRoomMutation();
+    const [updateRoom] = useUpdateRoomMutation();
+
     const formik = useFormik({
         initialValues,
         validationSchema,
         onSubmit: async (values, { setSubmitting }) => {
             setSubmitting(true)
             if (mode === 'add') {
-                await handleAdd(values);
+                await addRoom(values).unwrap();
+                toast.success('Room added successfully!');
             } else if (mode === 'edit') {
-                await handleEdit(values);
+                await updateRoom({ id: rowData.id, ...values }).unwrap();
+                toast.success('Room updated successfully!');
             }
+            onClose()
+            onSuccess()
         },
     });
 
@@ -44,58 +52,6 @@ const EnrollRoom: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, rowDa
             });
         }
     }, [mode, rowData]);
-
-    const handleAdd = async (values: RoomData) => {
-        try {
-            const requestBody = {
-                room: values,
-            };
-
-            const response = await fetch('http://localhost:3000/rooms', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': localStorage.getItem('token') as string
-                },
-                body: JSON.stringify(requestBody),
-            });
-            const data = await response.json();
-            if (data?.status?.errors && data?.status?.errors.length > 0) {
-                data.status.errors.forEach((ele: string) => {
-                    toast.error(ele);
-                });
-            } else {
-                onSuccess(data);
-                toast.success('Room added successfully!');
-                onClose();
-            }
-        } catch (error) {
-            console.error('Error adding room:', error);
-        }
-    };
-
-    const handleEdit = async (values: RoomData) => {
-        try {
-            const requestBody = {
-                room: values,
-            };
-
-            const response = await fetch(`http://localhost:3000/rooms/${rowData.id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': localStorage.getItem('token') as string
-                },
-                body: JSON.stringify(requestBody),
-            });
-            const data = await response.json();
-            onSuccess(data);
-            toast.success('Room updated successfully!');
-            onClose();
-        } catch (error) {
-            console.error('Error updating room:', error);
-        }
-    };
 
     return (
         <div className="modal" style={{ display: 'block' }}>
