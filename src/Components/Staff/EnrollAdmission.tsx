@@ -3,7 +3,9 @@ import '../../Styles/Modal.css';
 import { ToastContainer, toast } from 'react-toastify';
 import '../../Styles/Room.css';
 import { AdminLogin } from '../../Utils/ApiRes';
-import { AdmissionDataById, AdmissionDetailById } from '../../Utils/interface';
+import { AdmissionDataById } from '../../Utils/interface';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../Redux/Store';
 
 interface EnrollRoomProps {
     onClose: () => void;
@@ -15,61 +17,24 @@ interface EnrollRoomProps {
         discharge_date: string;
         dignostic: string;
         admission_status: string;
-        staff_id?: number; // Make staff_id optional
-        room_id?: number; // Make room_id optional
-        patient_id?: number; // Make patient_id optional
+        staff_id?: number;
+        room_id?: number;
+        patient_id?: number;
     };
 }
-
-interface PatientData {
-    created_at: string;
-    date_of_birth: string;
-    first_name: string;
-    gender: string;
-    id: number;
-    last_name: string;
-    phone_no: string;
-    role_id: number;
-    updated_at: string;
-    user_id: number;
-}
-
-
-interface ApiResponseForUsers {
-    status: {
-        message: string;
-        data: {
-            id: number;
-            email: string;
-            created_at: string;
-            updated_at: string;
-            jti: string;
-        };
-        errors: [];
-    };
-}
-
-interface RoomData {
-    capacity: number;
-    charges: number;
-    created_at: string;
-    description: string;
-    id: number;
-    room_type: string;
-    updated_at: string;
-}
-
 
 const EnrollAdmission: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, rowData }) => {
-    const [loginData, setLoginData] = useState<AdminLogin | null>(null);
     const [rooms, setRooms] = useState<any[]>([]);
     const [patients, setPatients] = useState<any[]>([]);
+    const loginData: any = useSelector((state: RootState) => {
+        return state.auth.user?.loginData
+    });
     const [formData, setFormData] = useState<EnrollRoomProps['admissionData']>({
         admission_date: '',
         discharge_date: '',
         dignostic: '',
         admission_status: '',
-        staff_id: loginData?.status?.data?.id,
+        staff_id: loginData?.data?.id,
         room_id: 0,
         patient_id: 0,
     });
@@ -78,10 +43,7 @@ const EnrollAdmission: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, 
         fetchRoomsData();
         fetchPatientsData();
     }, []);
-    useEffect(() => {
-        const storedLoginData = JSON.parse(localStorage.getItem('loginData') as string);
-        setLoginData(storedLoginData);
-    }, []);
+
 
     useEffect(() => {
         if (loginData && loginData.status && loginData.status.data) {
@@ -90,7 +52,7 @@ const EnrollAdmission: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, 
                 discharge_date: '',
                 dignostic: '',
                 admission_status: '',
-                staff_id: loginData.status.data.id,
+                staff_id: loginData?.data?.id,
                 room_id: 0,
                 patient_id: 0,
             });
@@ -151,13 +113,14 @@ const EnrollAdmission: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, 
             const apiResById: AdmissionDataById = await response.json();
             if (apiResById.data) {
                 const detailsById = apiResById.data;
+                console.log(detailsById)
                 if (detailsById != null) {
                     const editObj = {
                         admission_date: detailsById?.admission_date,
                         discharge_date: detailsById?.discharge_date,
                         dignostic: detailsById?.dignostic,
                         admission_status: detailsById?.admission_status,
-                        staff_id: loginData?.status?.data?.id,
+                        staff_id: loginData?.data?.id,
                         room_id: detailsById?.room_id,
                         patient_id: detailsById?.patient_id,
                     };
@@ -170,6 +133,7 @@ const EnrollAdmission: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, 
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        console.log(e)
         const { name, value } = e.target;
         setFormData((prevData: any) => ({
             ...prevData,
@@ -185,9 +149,9 @@ const EnrollAdmission: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, 
 
     const handleAdd = async () => {
         try {
-            const requestBody = {
-                "admission": formData
-            }
+
+            const requestBody = { admission: formData }
+            debugger
             const responseForUser = await fetch('http://localhost:3000/admissions', {
                 method: 'POST',
                 headers: {
@@ -208,9 +172,7 @@ const EnrollAdmission: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, 
 
     const handleEdit = async () => {
         try {
-            const requestBody = {
-                "admission": formData
-            }
+            const requestBody = { "admission": formData }
             const responseForUser = await fetch(`http://localhost:3000/admissions/${rowData.id}`, {
                 method: 'PUT',
                 headers: {
@@ -230,7 +192,7 @@ const EnrollAdmission: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, 
     };
 
     return (
-        <div className="modal" style={{display:'block'}}>
+        <div className="modal" style={{ display: 'block' }}>
             <div className="modal-content">
                 <div className='row'>
                     <div className='col-2'></div>
@@ -241,38 +203,59 @@ const EnrollAdmission: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, 
                         <span className="close" onClick={onClose}>&times;</span>
                     </div>
                 </div>
-                <form onSubmit={handleSubmit}>
-                    <div className="input-group">
-                        <input type="text" name="admission_date" value={formData?.admission_date} onChange={handleChange} placeholder="Admission Date" />
-                    </div>
-                    <div className="input-group">
-                        <input type="text" name="discharge_date" value={formData?.discharge_date} onChange={handleChange} placeholder="Discharge Date" />
-                    </div>
-                    <div className="input-group">
-                        <input type="text" name="dignostic" value={formData?.dignostic} onChange={handleChange} placeholder="Diagnostic" />
-                    </div>
-                    <div className="input-group">
-                        <input type="text" name="admission_status" value={formData?.admission_status} onChange={handleChange} placeholder="Admission Status" />
-                    </div>
-                    <div className="input-group">
-                        <select name="room_id" value={formData?.room_id} onChange={handleChange} style={{ width: '100%', padding: '8px' }}>
-                            <option value="">Select Room</option>
-                            {rooms && rooms.length > 0 && rooms.map((room) => (
-                                <option key={room.id} value={room.id}>{room?.room_type}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="input-group">
-                        <select name="patient_id" value={formData?.patient_id} onChange={handleChange} style={{ width: '100%', padding: '8px' }}>
-                            <option value="">Select Patient</option>
-                            {patients?.map((patient) => (
-                                <option key={patient.id} value={patient.id}>{patient?.first_name + " " + patient?.last_name}</option>
-                            ))}
-                        </select>
-                    </div>
+                <div className="form-container">
+                    <form onSubmit={handleSubmit}>
+                        <div className="input-group">
+                            <label htmlFor="admission_date">Admission Date</label>
+                            <input type="date" name="admission_date" value={formData?.admission_date} onChange={handleChange} placeholder="Admission Date" />
+                        </div>
+                        <div className="input-group">
+                            <label htmlFor="discharge_date">Discharge Date</label>
+                            <input type="date" name="discharge_date" min={formData?.admission_date} value={formData?.discharge_date} onChange={handleChange} placeholder="Discharge Date" />
+                        </div>
+                        <div className="input-group">
+                            <label htmlFor="dignostic">Dignostic</label>
+                            <input type="text" name="dignostic" value={formData?.dignostic} onChange={handleChange} placeholder="Diagnostic" />
+                        </div>
+                        <div className="input-group">
+                            <label htmlFor="admission_status">Admission Status</label>
+                            <select name="admission_status" value={formData?.admission_status} onChange={handleChange} style={{ width: '100%', padding: '8px' }}>
+                                <option key="1" value="">Select Status</option>
+                                <option key="2" value="pending">Pending</option>
+                                <option key="3" value="accepted">Accepted/Approved</option>
+                                <option key="4" value="rejected">Rejected/Declined</option>
+                                <option key="5" value="waitlisted">Waitlisted</option>
+                                <option key="6" value="deferred">Deferred</option>
+                                <option key="7" value="withdrawn">Withdrawn</option>
+                                <option key="8" value="cancelled">Cancelled</option>
+                                <option key="9" value="conditional">Conditional</option>
+                                <option key="10" value="admittedWithScholarship">Admitted with Scholarship/Funding</option>
+                            </select>
 
-                    <button type="submit" className="btn btn-primary">Submit</button>
-                </form>
+                            {/* <input type="text" name="admission_status" value={formData?.admission_status} onChange={handleChange} placeholder="Admission Status" /> */}
+                        </div>
+                        <div className="input-group">
+                            <label htmlFor="room_id">Room</label>
+                            <select name="room_id" value={formData?.room_id} onChange={handleChange} style={{ width: '100%', padding: '8px' }}>
+                                <option value="">Select Room</option>
+                                {rooms && rooms.length > 0 && rooms.map((room) => (
+                                    <option key={room.id} value={room.id}>{room?.room_type}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="input-group">
+                            <label htmlFor="patient_id">Patient</label>
+                            <select name="patient_id" value={formData?.patient_id} onChange={handleChange} style={{ width: '100%', padding: '8px' }}>
+                                <option value="">Select Patient</option>
+                                {patients?.map((patient) => (
+                                    <option key={patient.id} value={patient.id}>{patient?.first_name + " " + patient?.last_name}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <button type="submit" className="btn btn-primary">Submit</button>
+                    </form>
+                </div>
             </div>
             <ToastContainer
                 position="top-right"

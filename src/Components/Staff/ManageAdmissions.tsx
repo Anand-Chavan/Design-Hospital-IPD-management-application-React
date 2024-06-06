@@ -9,17 +9,9 @@ import EnrollAdmission from './EnrollAdmission';
 import { AdmissionData, AdmissionDetail, InvoiceData } from '../../Utils/interface';
 import InvoicePopup from './InvoicePopup';
 import TreatmentForm from './TreatmentForm';
+import { RootState } from '../../Redux/Store';
+import { useSelector } from 'react-redux';
 
-// Sample object structure for admission
-const admissionObj = {
-  admission_date: 'Unknown Type: date',
-  discharge_date: 'Unknown Type: date',
-  dignostic: 'string',
-  admission_status: 'string',
-  staff_id: 0,
-  room_id: 0,
-  patient_id: 0,
-};
 
 const downloadInvoiceAPI = async (id: number) => {
   let responseFromApi!: InvoiceData;
@@ -110,10 +102,12 @@ const ManageAdmissions = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [mode, setMode] = useState('add');
   const [selectedRow, setSelectedRow] = useState<SelectedRow | null>(null);
-  const [loginData, setLoginData] = useState<AdminLogin | null>(null);
   const [showInvoice, setShowInvoice] = useState(false);
   const [invoiceData, setInvoiceData] = useState<InvoiceData>(sampleData);
   const [showPopup, setShowPopup] = useState(false);
+  const loginData: any = useSelector((state: RootState) => {
+    return state.auth.user?.loginData
+  });
 
 
   const handleCloseInvoice = () => {
@@ -125,7 +119,6 @@ const ManageAdmissions = () => {
       try {
         const resp = await getAdmissionDetails();
         setAdmissionDetails(resp);
-        setLoginData(JSON.parse(localStorage.getItem('loginData') as string));
       } catch (error) {
         console.error('Error fetching admission details:', error);
         toast.error('Failed to fetch admission details'); // Add a toast for error handling
@@ -198,7 +191,7 @@ const ManageAdmissions = () => {
               </div>
             </div>
             <div className="row m-2">
-              {loginData?.status.role == 'staff' ? (
+              {loginData?.role == 'staff' ? (
                 <CommonTable
                   data={admissionDetails}
                   columns={AdmissionDetailsColumn} // Change this to AdmissionDetailsColumn if needed
