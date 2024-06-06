@@ -5,7 +5,6 @@ import { StaffDetailsColumn } from "../../Utils/Column";
 import EnrollStaff from "./EnrollStaff";
 import '../../Styles/ListStaff.css'
 import { SelectedRow } from "../../Utils/Constants";
-import { FaSearch } from "react-icons/fa";
 
 
 
@@ -22,7 +21,6 @@ const getStaffDetails = async () => {
 
     if (response.ok) {
       staffDetails = await response.json();
-      // toast.success('Data fetch successful!');
     } else {
       toast.error('Something went wrong');
     }
@@ -47,7 +45,6 @@ const deleteStaffDetails = async (userId: number) => {
 
     if (response.ok) {
       staffDetails = await response.json();
-      // toast.success('Data fetch successful!');
     } else {
       toast.error('Something went wrong');
     }
@@ -84,7 +81,7 @@ const ListStaff = () => {
     fetchStaffDetails();
   }, []);
 
-  const handleSuccess = (newStaff: any[]) => {
+  const handleSuccess = () => {
     getStaffDetails().then((resp: any) => {
       setStaffDetails(resp.staff)
       setOriginalStaffDetails(resp.staff);
@@ -117,7 +114,6 @@ const ListStaff = () => {
   }
 
   const handleSearchInput = (event: any) => {
-    console.log(event.target.value);
     setSearchTerm(event.target.value);
     if (event.target.value != '') {
       const filteredAndSortedData = originalStaffDetails
@@ -142,16 +138,6 @@ const ListStaff = () => {
           <>
             <div className="row m-2">
               <div className="col-md-4">
-                {/* <div className="search-bar">
-                  <FaSearch className="search-icon" ></FaSearch>
-                  <input
-                    type="text"
-                    className="search-input"
-                    placeholder="Search..."
-                    value={searchTerm}
-                    onChange={handleSearchInput}
-                  />
-                </div> */}
               </div>
               <div className="col-md-4">
                 <h2>Staff Details</h2>

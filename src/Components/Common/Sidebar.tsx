@@ -17,7 +17,6 @@ const Sidebar: React.FC<ComponentBProps> = ({ handleRouteFromApp }) => {
     });
 
     useEffect(() => {
-        console.log(loginData);
         if(loginData != undefined){
             if (loginData?.role === 'admin') {
                 setSelectedItem(AdminMenu[0]);

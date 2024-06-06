@@ -4,50 +4,14 @@ import '../../Styles/Room.css';
 import { ToastContainer, toast } from 'react-toastify';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
-
-
-interface EnrollStaffProps {
-  onClose: () => void;
-  onSuccess: (newStaff: any) => void;
-  mode: string,
-  rowData?: any
-}
-
-interface StaffData {
-  first_name: string;
-  last_name: string;
-  date_of_birth: string;
-  gender: string;
-  phone_no: string;
-  email: string;
-  password: string;
-}
-
-interface ApiResponseForUsers {
-  status: {
-    message: string;
-    data: {
-      id: number;
-      email: string;
-      created_at: string;
-      updated_at: string;
-      jti: string;
-    };
-    errors: []
-  };
-}
-
+import { useAddStaffMutation, useAddStaffDetailsMutation, useEditStaffDetailsMutation, StaffData } from '../../Redux/Slices/StaffSlice';
+import { EnrollStaffProps } from '../../Utils/interface';
 
 const EnrollStaff: React.FC<EnrollStaffProps> = ({ onClose, onSuccess, mode, rowData }) => {
-  const [formData, setFormData] = useState<StaffData>({
-    first_name: '',
-    last_name: '',
-    date_of_birth: '',
-    gender: '',
-    phone_no: '',
-    email: '',
-    password: ''
-  });
+
+  const [addStaff] = useAddStaffMutation();
+  const [addStaffDetails] = useAddStaffDetailsMutation();
+  const [editStaffDetails] = useEditStaffDetailsMutation();
 
   const initialValues: StaffData = {
     first_name: '',
@@ -65,132 +29,84 @@ const EnrollStaff: React.FC<EnrollStaffProps> = ({ onClose, onSuccess, mode, row
     date_of_birth: Yup.date().required('Date of birth is required'),
     gender: Yup.string().required('Gender is required'),
     phone_no: Yup.string().matches(/^\d{10}$/, 'Phone number must be 10 digits').required('Phone number is required'),
-    email: Yup.string().email('Invalid email address').required('Email is required'),
-    password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
+    ...(mode === 'add'
+      ? {
+        email: Yup.string().email('Invalid email address').required('Email is required'),
+        password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
+      }
+      : {}),
   });
+
 
   const formik = useFormik({
     initialValues,
     validationSchema,
-    onSubmit: async () => {
+    onSubmit: async (values, { setSubmitting }) => {
+      setSubmitting(true)
       if (mode == 'add')
-        handleAdd();
+        handleAdd(values);
       if (mode == 'edit')
-        handleEdit();
+        handleEdit(values);
     },
   });
 
-
-
   useEffect(() => {
-    if (mode == 'edit') {
-      const editObj = {
-        first_name: rowData?.first_name,
-        last_name: rowData?.last_name,
-        date_of_birth: rowData?.date_of_birth,
-        gender: rowData?.gender,
-        phone_no: rowData?.phone_no,
-        email: '',
-        password: '',
-      }
-      setFormData(editObj)
+    if (mode === 'edit' && rowData) {
+      formik.setValues({
+        first_name: rowData.first_name || '',
+        last_name: rowData.last_name || '',
+        date_of_birth: rowData.date_of_birth || '',
+        gender: rowData.gender || '',
+        phone_no: rowData.phone_no || '',
+        email: rowData.email || '',
+        password: rowData.password || ''
+      });
     }
-  }, [])
+  }, [mode, rowData]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prevData => ({
-      ...prevData,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (mode == 'add')
-      handleAdd();
-    if (mode == 'edit')
-      handleEdit();
-  };
-
-
-
-  const handleAdd = async () => {
+  const handleAdd = async (values: StaffData) => {
     try {
-      const requestBody = {
-        "user": {
-          "email": formData.email,
-          "password": formData.password
-        }
-      }
-      const responseForUser = await fetch('http://localhost:3000/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': localStorage.getItem('token') as string
-        },
-        body: JSON.stringify(requestBody),
-      });
-      const dataForUsers: ApiResponseForUsers = await responseForUser.json();
-      if (dataForUsers.status.errors && dataForUsers.status.errors.length > 0) {
-        dataForUsers.status.errors.forEach((ele: string) => {
-          toast.success(ele)
-        })
-      }
+      const userResponse = await addStaff({ email: values.email, password: values.password }).unwrap();
+      const detailsResponse = await addStaffDetails({
+        first_name: values.first_name,
+        last_name: values.last_name,
+        date_of_birth: values.date_of_birth,
+        gender: values.gender,
+        phone_no: values.phone_no,
+        user_id: userResponse.status.data.id,
+        role_id: 2,
+      }).unwrap();
 
-      const requestBodyForUserDetails = {
-        "user_detail": {
-          "first_name": formData.first_name,
-          "last_name": formData.last_name,
-          "date_of_birth": formData.date_of_birth,
-          "gender": formData.gender,
-          "phone_no": formData.phone_no,
-          "user_id": dataForUsers.status.data.id,
-          "role_id": 2
-        }
-      }
-
-      const responseForUserDetails = await fetch('http://localhost:3000/user_details', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': localStorage.getItem('token') as string
-        },
-        body: JSON.stringify(requestBodyForUserDetails),
-      });
-      const dataForUserDetails = await responseForUserDetails.json();
-      onSuccess(dataForUserDetails);
-      toast.success('User Added successful!');
+      onSuccess();
+      toast.success('User added successfully!');
       onClose();
-    } catch (error) {
+    } catch (error: any) {
+      if (error.data.status.errors.length > 0) {
+        error.data.status.errors.forEach((error: string) => {
+          toast.error(error);
+        });
+        return;
+      }
       console.error('Error adding staff:', error);
     }
   }
 
-  const handleEdit = async () => {
+  const handleEdit = async (values: StaffData) => {
     try {
-      const requestBodyForUserDetails = {
-        "user_detail": {
-          "first_name": formData.first_name,
-          "last_name": formData.last_name,
-          "date_of_birth": formData.date_of_birth,
-          "gender": formData.gender,
-          "phone_no": formData.phone_no,
-          "user_id": rowData.user_id,
-          "role_id": 2
-        }
-      }
-      const responseForUserDetails = await fetch(`http://localhost:3000/user_details/${rowData.user_id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': localStorage.getItem('token') as string
+      const detailsResponse = await editStaffDetails({
+        id: rowData.user_id,
+        details: {
+          first_name: values.first_name,
+          last_name: values.last_name,
+          date_of_birth: values.date_of_birth,
+          gender: values.gender,
+          phone_no: values.phone_no,
+          role_id: 2,
         },
+      }).unwrap();
 
-        body: JSON.stringify(requestBodyForUserDetails),
-      });
-      onSuccess(responseForUserDetails);
-      toast.success('User Updated successful!');
+      onSuccess();
+      toast.success('User updated successfully!');
       onClose();
     } catch (error) {
       console.error('Error adding staff:', error);
@@ -259,8 +175,10 @@ const EnrollStaff: React.FC<EnrollStaffProps> = ({ onClose, onSuccess, mode, row
                     type="radio"
                     name="gender"
                     value="male"
-                    checked={formData.gender === "male"}
-                    onChange={handleChange}
+                    checked={formik.values.gender === "male"}
+                    onChange={(e) => {
+                      formik.handleChange(e);
+                    }}
                     required
                   />
                   Male
@@ -270,8 +188,10 @@ const EnrollStaff: React.FC<EnrollStaffProps> = ({ onClose, onSuccess, mode, row
                     type="radio"
                     name="gender"
                     value="female"
-                    checked={formData.gender === "female"}
-                    onChange={handleChange}
+                    checked={formik.values.gender === "female"}
+                    onChange={(e) => {
+                      formik.handleChange(e);
+                    }}
                     required
                   />
                   Female
@@ -290,7 +210,6 @@ const EnrollStaff: React.FC<EnrollStaffProps> = ({ onClose, onSuccess, mode, row
                 pattern="[0-9]{3}[0-9]{3}[0-9]{4}"
                 required
               />
-              {/* <small>Format: XXXXXXXXXX</small> */}
               {formik.touched.phone_no && formik.errors.phone_no ? (
                 <label className="error-message">{formik.errors.phone_no}</label>
               ) : null}
@@ -323,50 +242,9 @@ const EnrollStaff: React.FC<EnrollStaffProps> = ({ onClose, onSuccess, mode, row
                 </div>
               </>
             )}
-            <button type="submit" disabled={!formik.isValid} className="btn btn-primary">Submit</button>
+            <button type="submit" disabled={!formik.isValid || !formik.dirty || formik.isSubmitting} className="btn btn-primary">Submit</button>
           </form>
         </div>
-
-        {/* <form onSubmit={handleSubmit}>
-          <div className="input-group">
-            <input type="text" name="first_name" value={formData.first_name} onChange={handleChange} placeholder="First Name" />
-          </div>
-          <div className="input-group">
-            <input type="text" name="last_name" value={formData.last_name} onChange={handleChange} placeholder="Last Name" />
-          </div>
-          <div className="input-group">
-            <input type="text" name="date_of_birth" value={formData.date_of_birth} onChange={handleChange} placeholder="Date of Birth" />
-          </div>
-          <div className="input-group">
-            <input type="text" name="gender" value={formData.gender} onChange={handleChange} placeholder="Gender" />
-          </div>
-          <div className="input-group">
-            <input type="text" name="phone_no" value={formData.phone_no} onChange={handleChange} placeholder="Phone Number" />
-          </div>
-          {mode === 'add' && (
-            <>
-              <div className="input-group">
-                <input
-                  type="text"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="Email"
-                />
-              </div>
-              <div className="input-group">
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Password"
-                />
-              </div>
-            </>
-          )}
-          <button type="submit" className="btn btn-primary">Submit</button>
-        </form> */}
       </div>
       <ToastContainer position="top-right"
         autoClose={5000}

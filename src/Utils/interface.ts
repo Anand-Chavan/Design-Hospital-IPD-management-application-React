@@ -87,4 +87,41 @@ export interface RoomData {
 
 
 
+export interface EnrollStaffProps {
+    onClose: () => void;
+    onSuccess: () => void;
+    mode: string,
+    rowData?: any
+}
+
+export interface StaffData {
+    first_name: string;
+    last_name: string;
+    date_of_birth: string;
+    gender: string;
+    phone_no: string;
+    email: string;
+    password: string;
+    user_id?:number;
+    role_id?:number
+}
+
+export interface ApiResponseForUsers {
+    status: {
+        message: string;
+        data: {
+            id: number;
+            email: string;
+            created_at: string;
+            updated_at: string;
+            jti: string;
+        };
+        errors: []
+    };
+}
+
+
+
+
+
 

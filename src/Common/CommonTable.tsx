@@ -119,8 +119,6 @@ const CommonTable: React.FC<CommonTableProps> = ({ columns, data, handleEdit, ha
     usePagination
   ) as any;
 
-  console.log(headerGroups)
-
   return (
     <div className="common-table">
       <input
