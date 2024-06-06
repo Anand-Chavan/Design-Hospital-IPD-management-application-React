@@ -6,8 +6,8 @@ import axiosInstance from '../../Utils/AxiosConfig';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { postUserDetails, updateUserDetails } from '../../Redux/Slices/UserDetailSlice';
-import { AppDispatch } from '../../Redux/Store';
-import { useDispatch } from 'react-redux';
+import { AppDispatch, RootState } from '../../Redux/Store';
+import { useDispatch, useSelector } from 'react-redux';
 
 interface EnrollPatientProps {
   onClose: () => void;
@@ -26,22 +26,8 @@ interface PatientData {
   password: string;
 }
 
-interface ApiResponseForUsers {
-  status: {
-    message: string;
-    data: {
-      id: number;
-      email: string;
-      created_at: string;
-      updated_at: string;
-      jti: string;
-    };
-    errors: []
-  };
-}
-
 const EnrollPatient: React.FC<EnrollPatientProps> = ({ onClose, onSuccess, mode, rowData }) => {
-  const dispatch = useDispatch<AppDispatch>(); // Use the AppDispatch type
+  const dispatch = useDispatch<AppDispatch>();
   const [formData, setFormData] = useState<PatientData>({
     first_name: '',
     last_name: '',
@@ -160,8 +146,7 @@ const EnrollPatient: React.FC<EnrollPatientProps> = ({ onClose, onSuccess, mode,
           role_id: 3
         }
       };
-
-      const responseForUserDetails = await axiosInstance.put(`/user_details`, JSON.stringify(requestBodyForUserDetails));
+      const responseForUserDetails = await axiosInstance.put(`/user_details/${rowData?.user_id}`, JSON.stringify(requestBodyForUserDetails));
       onSuccess(responseForUserDetails.data);
       toast.success('User updated successfully!');
       onClose();
@@ -190,42 +175,70 @@ const EnrollPatient: React.FC<EnrollPatientProps> = ({ onClose, onSuccess, mode,
           }}
           enableReinitialize
         >
-          {({ isSubmitting }) => (
+          {({isSubmitting, dirty, isValid,values,handleChange }) => (
             <Form>
               <div className="form-container">
                 <div className="input-group">
+                  <label htmlFor="first_name">First Name</label>
                   <Field type="text" name="first_name" placeholder="First Name" />
                   <ErrorMessage name="first_name" component="div" className="error-message" />
                 </div>
                 <div className="input-group">
+                  <label htmlFor="last_name">Last Name</label>
                   <Field type="text" name="last_name" placeholder="Last Name" />
                   <ErrorMessage name="last_name" component="div" className="error-message" />
                 </div>
                 <div className="input-group">
-                  <Field type="text" name="date_of_birth" placeholder="Date of Birth" />
+                  <label htmlFor="date_of_birth">Date Of Birth</label>
+                  <Field type="date" name="date_of_birth" placeholder="Date of Birth" />
                   <ErrorMessage name="date_of_birth" component="div" className="error-message" />
                 </div>
                 <div className="input-group">
-                  <Field type="text" name="gender" placeholder="Gender" />
+                  <label>Gender</label>
+                  <div>
+                    <label>
+                      <Field
+                        type="radio"
+                        name="gender"
+                        value="male"
+                        checked={values.gender === "male"}
+                        onChange={handleChange}
+                      />
+                      Male
+                    </label>
+                    <label>
+                      <Field
+                        type="radio"
+                        name="gender"
+                        value="female"
+                        checked={values.gender === "female"}
+                        onChange={handleChange}
+                      />
+                      Female
+                    </label>
+                  </div>
                   <ErrorMessage name="gender" component="div" className="error-message" />
                 </div>
                 <div className="input-group">
+                  <label htmlFor="phone_no">Phone Number</label>
                   <Field type="text" name="phone_no" placeholder="Phone Number" />
                   <ErrorMessage name="phone_no" component="div" className="error-message" />
                 </div>
                 {mode === 'add' && (
                   <>
                     <div className="input-group">
+                      <label htmlFor="email">Email</label>
                       <Field type="text" name="email" placeholder="Email" />
                       <ErrorMessage name="email" component="div" className="error-message" />
                     </div>
                     <div className="input-group">
+                      <label htmlFor="password">Password</label>
                       <Field type="password" name="password" placeholder="Password" />
                       <ErrorMessage name="password" component="div" className="error-message" />
                     </div>
                   </>
                 )}
-                <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                <button type="submit" className="btn btn-primary" disabled={!isValid || !dirty || isSubmitting}>
                   Submit
                 </button>
               </div>

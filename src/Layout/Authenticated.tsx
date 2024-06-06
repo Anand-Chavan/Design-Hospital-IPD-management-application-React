@@ -2,8 +2,6 @@ import { Suspense, useEffect, useState } from "react";
 import Header from "../Components/Common/Navbar";
 import Sidebar from "../Components/Common/Sidebar";
 import components from '../Menu/AdminMenu';
-import { AdminLogin } from "../Utils/ApiRes";
-import { getUserDetailsById } from "../Utils/GetUserDetailsById";
 import { MenuItem } from "../Utils/Constants";
 import { UserDetails } from "../Utils/interface";
 import { AdminMenu, StaffMenu, PatientMenu } from '../Utils/Constants';
