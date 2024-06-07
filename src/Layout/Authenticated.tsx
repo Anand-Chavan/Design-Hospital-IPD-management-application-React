@@ -36,7 +36,6 @@ const Authenticated = ({ loadInUserData }: AuthenticatedProps) => {
                 setContent(StaffMenu[0].component);
             } else {
                 setContent(PatientMenu[0].component);
-                // Handle other roles or no role scenario
             }
         }
     }, [loginData]);

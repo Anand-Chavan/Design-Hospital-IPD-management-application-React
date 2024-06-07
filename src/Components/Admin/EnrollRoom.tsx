@@ -76,9 +76,12 @@ const EnrollRoom: React.FC<EnrollRoomProps> = ({ onClose, onSuccess, mode, rowDa
                                 required
                             >
                                 <option value="">Select Room Type</option>
-                                <option value="Single">Single</option>
-                                <option value="Double">Double</option>
-                                <option value="Suite">Suite</option>
+                                <option value="Single">Intensive Care Unit (ICU) Room</option>
+                                <option value="Double">Neonatal Intensive Care Unit (NICU) Room</option>
+                                <option value="Suite">Pediatric Room</option>
+                                <option value="Single">General Ward</option>
+                                <option value="Double"> Semi-Private Room</option>
+                                <option value="Suite">Private Room</option>
                             </select>
                             {formik.touched.room_type && formik.errors.room_type ? (
                                 <label className="error-message">{formik.errors.room_type}</label>
