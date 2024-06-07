@@ -140,7 +140,7 @@ const CommonTable: React.FC<CommonTableProps> = ({ columns, data, handleEdit, ha
                     <>
                       <th key={indexTh} {...column.getHeaderProps(column.getSortByToggleProps())}>
                         {column.render('Header')}
-                        {(column.render('Header')!="Actions") ? (column.isSorted ? (
+                        {(column.render('Header')!="Actions" && column.render('Header')!="Treatment") ? (column.isSorted ? (
                           column.isSortedDesc ? (
                             <FaSortDown />
                           ) : (

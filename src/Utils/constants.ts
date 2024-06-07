@@ -12,7 +12,7 @@ export const StaffMenu = [
 ];
 
 export const PatientMenu = [
-  { name: 'Profile', key: 'patient_details', path: 'patient_details', component: '' },
+  { name: 'Profile Profile', key: 'patient_details', path: 'patient_details', component: 'PatientProfile' },
 ];
 
 export interface MenuItem {

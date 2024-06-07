@@ -19,10 +19,11 @@ const MainContainer = () => {
 
     const getUserDetails = async() =>{
         setLoggedInUsedData(await getUserDetailsById(loginData?.data?.id))
+        // setLoggedInUsedData(await getUserDetailsById(22))
     }
 
     useEffect(()=>{
-        if(loadInUserData == null){
+        if(loadInUserData == null || loadInUserData == undefined){
             getUserDetails()
         }
     },[])

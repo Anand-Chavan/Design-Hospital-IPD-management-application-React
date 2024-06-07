@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import '../../Styles/Modal.css';
 import { ToastContainer, toast } from 'react-toastify';
 import '../../Styles/Room.css';
-import { AdminLogin } from '../../Utils/ApiRes';
 import { AdmissionDataById } from '../../Utils/interface';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../Redux/Store';

@@ -4,7 +4,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import CommonTable from '../../Common/CommonTable';
 import { AdmissionDetailsColumn, RoomDetailsColumn } from '../../Utils/Column';
 import { SelectedRow } from '../../Utils/Constants';
-import { AdminLogin } from '../../Utils/ApiRes';
 import EnrollAdmission from './EnrollAdmission';
 import { AdmissionData, AdmissionDetail, InvoiceData } from '../../Utils/interface';
 import InvoicePopup from './InvoicePopup';
